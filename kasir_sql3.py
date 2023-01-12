@@ -50,7 +50,7 @@ if menu == 'Daftar Produk':
 elif menu == 'Tambah Produk':
     st.header('Tambah Produk')
     nama_produk = st.text_input('Nama Produk')
-    harga_produk = st.number_input('Harga Produk',format=lambda n: '{:,}'.format(n))
+    harga_produk = st.text_input('Harga Produk',format=lambda n: '{:,}'.format(n))
     harga_pokok = st.number_input('Harga Pokok',0)
     stok_produk = st.number_input('Stok Produk',0)
     if st.button('Simpan'):
