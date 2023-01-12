@@ -27,3 +27,5 @@ If the user selects "Tambah Pengeluaran" from the menu, the script displays a fo
 The Apriori option allows the user to perform association rule mining by analyzing transaction data from the "transaksi" table in the database and creating association rules between the purchased products. The apriori function from mlxtend.frequent_patterns is used to find the frequent item sets and association_rules is used to find the association rules
 
 The script also has several other options to display the profit, transaction history and also other features that you can customize.
+
+https://aldop07-pos-kasir-sql3-8g990c.streamlit.app/
