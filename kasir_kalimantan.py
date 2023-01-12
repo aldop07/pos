@@ -193,20 +193,6 @@ elif menu == 'Apriori':
         # Mengubah data menjadi tabulasi
         tabular = pd.crosstab (df["tanggal"],df["nama"])
 
-
-        dta = pd.DataFrame(tabular)
-        download = dta.to_excel
-        if download :
-                with open("Tabulasi.xls", "wb") as f: # buka file Tabulasi.xls dalam mode binary write
-
-                    dta.to_excel(f) # menulis dataframe dta ke file excel
-
-                with open("Tabulasi.xls", "rb") as f: #buka file Tabulasi.xls dalam mode binary read
-
-                    excel_file = f.read() #membaca data biner
-
-                st.download_button(label="Download Excel", data=excel_file, file_name="Tabulasi.xls", mime='text/xls')
-
         # Encoding data
         def hot_encode(x) :
             if (x<=0):
