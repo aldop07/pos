@@ -34,7 +34,7 @@ if menu == 'Daftar Produk':
 
     # Tambahkan form input untuk mengubah stok produk
     st.header('Update Stok Produk')
-    list_produk = ['Pilih produk...'] + list(df['nama'])
+    list_produk = ['PILIH PRODUK'] + list(df['nama'])
     produk = st.selectbox('Produk', list_produk)
     stok_produk = st.number_input('Stok Produk',0)
     if st.button('Update'):
@@ -73,7 +73,7 @@ elif menu == 'Tambah Transaksi':
    
     # Buat list nama produk untuk dipilih dalam form input transaksi
     tanggal = st.date_input('Tanggal')
-    list_nama_produk = ['Pilih produk...'] + list(df['nama'])
+    list_nama_produk = ['PILIH PRODUK'] + list(df['nama'])
     nama_produk = st.selectbox('Nama Produk', list_nama_produk)
     jumlah_produk = st.number_input('Jumlah Produk',0)
     if jumlah_produk == 0:
