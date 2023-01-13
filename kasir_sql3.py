@@ -118,7 +118,7 @@ elif menu == 'Tambah Pengeluaran':
 # Tampilan menu Laba
 elif menu == 'Laba':
     st.header('Laba')
-    tanggal_awal = st.date_input('Tanggal Awal')
+    tanggal_awal = st.date_input('Tanggal Mulai')
     tanggal_akhir = st.date_input('Tanggal Akhir')
     
     # Hitung total pengeluaran
