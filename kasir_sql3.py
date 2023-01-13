@@ -196,6 +196,20 @@ elif menu == 'Apriori':
         # Mengubah data menjadi tabulasi
         tabular = pd.crosstab (df["tanggal"],df["nama"])
 
+
+        dta = pd.DataFrame(tabular)
+        download = dta.to_excel
+        if download :
+                with open("Tabulasi.xls", "wb") as f: # buka file Tabulasi.xls dalam mode binary write
+
+                    dta.to_excel(f) # menulis dataframe dta ke file excel
+
+                with open("Tabulasi.xls", "rb") as f: #buka file Tabulasi.xls dalam mode binary read
+
+                    excel_file = f.read() #membaca data biner
+
+                st.download_button(label="Download Excel", data=excel_file, file_name="Tabulasi.xls", mime='text/xls')
+
         # Encoding data
         def hot_encode(x) :
             if (x<=0):
@@ -210,12 +224,15 @@ elif menu == 'Apriori':
         minimum_support = st.number_input("Nilai minimum support:",0.1)
         if minimum_support <= 0:
             st.warning("Nilai minimum support tidak boleh kosong atau nol.")
+        minimum_confidence = st.number_input("Nilai minimum confidence:",0.1)
+        if minimum_confidence <= 0:
+            st.warning("Nilai minimum confidence tidak boleh kosong atau nol.")
 
         # Membuat model Apriori
         frq_items = apriori(tabular_encode, min_support=minimum_support, use_colnames= True)
 
         # Mengumpulkan aturan dalam dataframe
-        rules = association_rules(frq_items, metric="lift",min_threshold=1)
+        rules = association_rules(frq_items, metric="lift",min_threshold=minimum_confidence)
         rules = rules.sort_values(['confidence','lift'], ascending=[False, False])
 
         # Menampilkan hasil dari algoritma Apriori
