@@ -196,6 +196,7 @@ elif menu == 'Riwayat Transaksi':
         query = "SELECT date(tanggal) as tanggal, SUM(jumlah) as jumlah_penjualan FROM transaksi WHERE tanggal BETWEEN ? AND ? GROUP BY date(tanggal)"
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
         fig = px.bar(df, x='tanggal', y='jumlah_penjualan')
+        fig.update_layout(autosize=True)
         st.plotly_chart(fig)
 
     if tanggal_mulai and tanggal_akhir:
