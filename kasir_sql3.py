@@ -25,6 +25,8 @@ menu = st.sidebar.selectbox('', ['Dokumentasi', 'Daftar Produk', 'Tambah Produk'
 if menu == 'Dokumentasi':
     st.header('Dokumentasi')
     st.write('https://ejournal.bsi.ac.id/ejurnal/index.php/khatulistiwa/article/viewFile/8994/4535')
+    st.write('https://publikasi.dinus.ac.id/index.php/technoc/article/download/1273/951')
+    st.write('https://jurnal.umj.ac.id/index.php/jurtek/article/download/992/967')
     #pdf_url = "https://ejournal.bsi.ac.id/ejurnal/index.php/khatulistiwa/article/viewFile/8994/4535"
 
     #response = requests.get(pdf_url)
