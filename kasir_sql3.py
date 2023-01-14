@@ -20,8 +20,24 @@ st.title('Aplikasi Point Of Sale')
 # Buat sidebar dan menu dropdown
 st.sidebar.header('Menu')
 menu = st.sidebar.selectbox('', ['Daftar Produk', 'Tambah Produk', 'Tambah Transaksi', 'Tambah Pengeluaran', 'Laba', 'Riwayat Transaksi','Data Mining'])
+
+# Tampilan menu Dokumentasi
+if menu == 'Dokumentasi':
+   
+    pdf_url = "https://ejournal.bsi.ac.id/ejurnal/index.php/khatulistiwa/article/viewFile/8994/4535"
+
+    response = requests.get(pdf_url)
+    with open("temp.pdf", "wb") as f:
+        f.write(response.content)
+
+    with fitz.open("temp.pdf") as pdf:
+        for page in pdf:
+            pix = page.get_pixmap(alpha=False)
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            st.image(img, width=600)
+            
 # Tampilan menu Daftar Produk
-if menu == 'Daftar Produk':
+elif menu == 'Daftar Produk':
     st.header('Daftar Produk')
     query = 'SELECT nama, harga, stok FROM produk'
     df = pd.read_sql(query, cnx)
