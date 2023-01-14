@@ -5,7 +5,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mlxtend.frequent_patterns import apriori, association_rules
-
+import fitz
+import requests
+from PIL import Image
 
 #   IRFAN NOVALDO HUANG
 
