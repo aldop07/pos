@@ -201,7 +201,7 @@ elif menu == 'Riwayat Transaksi':
     if tanggal_mulai and tanggal_akhir:
         query = "SELECT nama, tanggal, SUM(jumlah) as jumlah_penjualan FROM transaksi WHERE tanggal BETWEEN ? AND ? GROUP BY nama, date(tanggal)"
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
-        df = df.pivot(index='tanggal', columns='nama', values='jumlah_penjualan')
+        df = df.pivot(index='tanggal', columns='nama', values='jumlah_penjualan').fillna(0)
         st.line_chart(df)
 
             
