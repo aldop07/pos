@@ -130,7 +130,7 @@ elif menu == 'Tambah Transaksi':
 elif menu == 'Tambah Pengeluaran':
     st.header('Tambah Pengeluaran')
     tanggal = st.date_input('Tanggal')
-    nama_pengeluaran = st.text_input('Nama Pengeluaran')
+    nama_pengeluaran = st.text_input('Jenis Pengeluaran')
     jumlah_pengeluaran = st.number_input('Jumlah Pengeluaran',0)
     if st.button('Simpan'):
         cursor = cnx.cursor()
