@@ -5,4 +5,3 @@ plotly
 pip
 matplotlib
 numpy
-sqlite3
