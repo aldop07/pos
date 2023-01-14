@@ -5,6 +5,3 @@ plotly
 pip
 matplotlib
 numpy
-fitz
-requests
-PIL
