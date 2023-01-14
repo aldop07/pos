@@ -19,7 +19,7 @@ st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
 st.title('Aplikasi Point Of Sale')
 # Buat sidebar dan menu dropdown
 st.sidebar.header('Menu')
-menu = st.sidebar.selectbox('', ['Daftar Produk', 'Tambah Produk', 'Tambah Transaksi', 'Tambah Pengeluaran', 'Laba', 'Riwayat Transaksi','Data Mining'])
+menu = st.sidebar.selectbox('', ['Dokumentasi', 'Daftar Produk', 'Tambah Produk', 'Tambah Transaksi', 'Tambah Pengeluaran', 'Laba', 'Riwayat Transaksi','Data Mining'])
 
 # Tampilan menu Dokumentasi
 if menu == 'Dokumentasi':
