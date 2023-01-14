@@ -1,22 +1,25 @@
 import streamlit as st
 import sqlite3
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mlxtend.frequent_patterns import apriori, association_rules
 
+
 #   IRFAN NOVALDO HUANG
 
 # Koneksi ke database SQLite
 cnx = sqlite3.connect('kasir.db')
+
+# Buat titit
 icon = 'https://th.bing.com/th/id/R.a406cbfb23b4d4937c5c3e323a7cb567?rik=4qO3lF%2ftE0LZTg&riu=http%3a%2f%2f1.bp.blogspot.com%2f-I-do3iLl5rs%2fUsuaG8IcjhI%2fAAAAAAAAAIE%2fXmXj-zTkS9U%2fs1600%2fUnsera.png&ehk=7Q%2f63voOpFTnTFwucAoLvddSl03O7NITAf9NPD3Ge7M%3d&risl=&pid=ImgRaw&r=0'
 st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
 
 st.title('Aplikasi Point Of Sale')
 # Buat sidebar dan menu dropdown
 st.sidebar.header('Menu')
-menu = st.sidebar.selectbox('', ['Daftar Produk', 'Tambah Produk', 'Tambah Transaksi', 'Tambah Pengeluaran', 'Laba', 'Riwayat Transaksi','Apriori'])
-
+menu = st.sidebar.selectbox('', ['Daftar Produk', 'Tambah Produk', 'Tambah Transaksi', 'Tambah Pengeluaran', 'Laba', 'Riwayat Transaksi','Data Mining'])
 # Tampilan menu Daftar Produk
 if menu == 'Daftar Produk':
     st.header('Daftar Produk')
@@ -34,7 +37,7 @@ if menu == 'Daftar Produk':
 
     # Tambahkan form input untuk mengubah stok produk
     st.header('Update Stok Produk')
-    list_produk = ['PILIH PRODUK'] + list(df['nama'])
+    list_produk = ['Pilih Produk'] + list(df['nama'])
     produk = st.selectbox('Produk', list_produk)
     stok_produk = st.number_input('Stok Produk',0)
     if st.button('Update'):
@@ -73,7 +76,8 @@ elif menu == 'Tambah Transaksi':
    
     # Buat list nama produk untuk dipilih dalam form input transaksi
     tanggal = st.date_input('Tanggal')
-    list_nama_produk = ['PILIH PRODUK'] + list(df['nama'])
+    nama_pelanggan = st.text_input ('Nama Pelanggan')
+    list_nama_produk = ['Pilih Produk'] + list(df['nama'])
     nama_produk = st.selectbox('Nama Produk', list_nama_produk)
     jumlah_produk = st.number_input('Jumlah Produk',0)
     if jumlah_produk == 0:
@@ -91,8 +95,8 @@ elif menu == 'Tambah Transaksi':
         if stok_produk >= jumlah_produk:
             
             # Tambahkan transaksi baru ke tabel transaksi
-            query = 'INSERT INTO transaksi (tanggal, nama, jumlah, harga, total) VALUES (?, ?, ?, ?, ?)'
-            cursor.execute(query, (tanggal, nama_produk, jumlah_produk, harga_produk, total_harga))
+            query = 'INSERT INTO transaksi (tanggal, nama_pelanggan, nama, jumlah, harga, total) VALUES (?, ?, ?, ?, ?, ?)'
+            cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk, jumlah_produk, harga_produk, total_harga))
            
             # Kurangi stok produk yang dibeli
             query = 'UPDATE produk SET stok = stok - ? WHERE nama = ?'
@@ -118,7 +122,7 @@ elif menu == 'Tambah Pengeluaran':
 # Tampilan menu Laba
 elif menu == 'Laba':
     st.header('Laba')
-    tanggal_awal = st.date_input('Tanggal Mulai')
+    tanggal_awal = st.date_input('Tanggal Awal')
     tanggal_akhir = st.date_input('Tanggal Akhir')
     
     # Hitung total pengeluaran
@@ -174,73 +178,91 @@ elif menu == 'Riwayat Transaksi':
         fig = px.bar(df, x='tanggal', y='jumlah_penjualan')
         st.plotly_chart(fig)
 
-# Tampilan menu Apriori
-elif menu == 'Apriori':
-    st.header('Apriori')
-    
-    # Input tanggal awal dan akhir
-    tanggal_mulai = st.date_input("Tanggal Mulai")
-    tanggal_akhir = st.date_input("Tanggal Akhir")
-    
     if tanggal_mulai and tanggal_akhir:
-        # Membaca data transaksi dari database SQLite
-        query = 'SELECT * FROM transaksi WHERE tanggal BETWEEN ? AND ?'
+        query = "SELECT nama, tanggal, SUM(jumlah) as jumlah_penjualan FROM transaksi WHERE tanggal BETWEEN ? AND ? GROUP BY nama, date(tanggal)"
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
+        df = df.pivot(index='tanggal', columns='nama', values='jumlah_penjualan')
+        st.line_chart(df)
 
-        # Mengubah tanggal yang ditampilkan  dataframe menjadi objek datatime
-        df['tanggal'] = pd.to_datetime(df['tanggal'])
+            
+# Tampilan menu Data Mining
+elif menu == 'Data Mining':
+    st.header('Data Mining')
 
-        # Memfilter data transaksi berdasarkan tanggal mulai dan akhir
-        df = df[(df['tanggal'] >= pd.to_datetime(tanggal_mulai)) & (df['tanggal'] <= pd.to_datetime(tanggal_akhir))]
+    # Sub Menu untuk data mining
+    sub_menu = st.selectbox('', ['Association Rule', 'Forecasting'])
+    if sub_menu == 'Association Rule':
+        st.header('Association Rule')
+    
+        # Input tanggal awal dan akhir
+        tanggal_mulai = st.date_input("Tanggal Mulai")
+        tanggal_akhir = st.date_input("Tanggal Akhir")
         
-        # Mengubah data menjadi tabulasi
-        tabular = pd.crosstab (df["tanggal"],df["nama"])
+        if tanggal_mulai and tanggal_akhir:
+            # Membaca data transaksi dari database SQLite
+            query = 'SELECT tanggal, nama_pelanggan, nama FROM transaksi WHERE tanggal BETWEEN ? AND ?'
+            df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
+
+            # Mengubah tanggal yang ditampilkan  dataframe menjadi objek datatime
+            df['tanggal'] = pd.to_datetime(df['tanggal'])
+
+            # Memfilter data transaksi berdasarkan tanggal mulai dan akhir
+            df = df[(df['tanggal'] >= pd.to_datetime(tanggal_mulai)) & (df['tanggal'] <= pd.to_datetime(tanggal_akhir))]
+            
+            # Mengubah data menjadi tabulasi
+            df['tanggal_nama_pelanggan'] = df['tanggal'].astype(str) +'-'+ df['nama_pelanggan']
+            tabular = pd.crosstab(df['tanggal_nama_pelanggan'],df['nama'])
 
 
-        dta = pd.DataFrame(tabular)
-        download = dta.to_excel
-        if download :
-                with open("Tabulasi.xls", "wb") as f: # buka file Tabulasi.xls dalam mode binary write
 
-                    dta.to_excel(f) # menulis dataframe dta ke file excel
+            dta = pd.DataFrame(tabular)
+            download = dta.to_excel
+            if download :
+                    with open("Tabulasi.xlsx", "wb") as f: # buka file Tabulasi.xls dalam mode binary write
 
-                with open("Tabulasi.xls", "rb") as f: #buka file Tabulasi.xls dalam mode binary read
+                        dta.to_excel(f) # menulis dataframe dta ke file excel
 
-                    excel_file = f.read() #membaca data biner
+                    with open("Tabulasi.xlsx", "rb") as f: #buka file Tabulasi.xls dalam mode binary read
 
-                st.download_button(label="Download Excel", data=excel_file, file_name="Tabulasi.xls", mime='text/xls')
+                        excel_file = f.read() #membaca data biner
 
-        # Encoding data
-        def hot_encode(x) :
-            if (x<=0):
-                return 0
-            if (x>=1):
-                return 1
+                    st.download_button(label="Download Excel", data=excel_file, file_name="Tabulasi.xlsx", mime='text/xlsx')
 
-        # Mengubah data menjadi binominal
-        tabular_encode = tabular.applymap(hot_encode)
+            # Encoding data
+            def hot_encode(x) :
+                if (x<=0):
+                    return 0
+                if (x>=1):
+                    return 1
 
-        # Mendefinisikan nilai minimum support dan minimum confidence
-        minimum_support = st.number_input("Nilai minimum support:",0.1)
-        if minimum_support <= 0:
-            st.warning("Nilai minimum support tidak boleh kosong atau nol.")
-        minimum_confidence = st.number_input("Nilai minimum confidence:",0.1)
-        if minimum_confidence <= 0:
-            st.warning("Nilai minimum confidence tidak boleh kosong atau nol.")
+            # Mengubah data menjadi binominal
+            tabular_encode = tabular.applymap(hot_encode)
 
-        # Membuat model Apriori
-        frq_items = apriori(tabular_encode, min_support=minimum_support, use_colnames= True)
+            # Mendefinisikan nilai minimum support dan minimum confidence
+            minimum_support = st.number_input("Nilai minimum support:",0.01)
+            if minimum_support <= 0:
+                st.warning("Nilai minimum support tidak boleh kosong atau nol.")
+            minimum_confidence = st.number_input("Nilai minimum confidence:",0.01)
+            if minimum_confidence <= 0:
+                st.warning("Nilai minimum confidence tidak boleh kosong atau nol.")
 
-        # Mengumpulkan aturan dalam dataframe
-        rules = association_rules(frq_items, metric="lift",min_threshold=minimum_confidence)
-        rules = rules.sort_values(['confidence','lift'], ascending=[False, False])
+            # Membuat model Apriori
+            frq_items = apriori(tabular_encode, min_support=minimum_support, use_colnames= True)
 
-        # Menampilkan hasil dari algoritma Apriori
-        if st.button("PROSES"):
-            st.success('HASIL PERHITUNGAN APRIORI')
+            # Mengumpulkan aturan dalam dataframe
+            rules = association_rules(frq_items, metric="lift",min_threshold=minimum_confidence)
+            rules = rules.sort_values(['confidence','lift'], ascending=[False, False])
 
-            # Mengubah nilai support, confidence, dan lift menjadi persentase
-            rules[["antecedent support","consequent support","support","confidence"]] = rules[["antecedent support","consequent support","support","confidence"]].applymap(lambda x: "{:.2f}%".format(x*100))
+            # Menampilkan hasil dari algoritma Apriori
+            if st.button("PROSES"):
+                st.success('HASIL PERHITUNGAN APRIORI')
 
-            # Menampilkan hasil algoritma apriori dalam bentuk dataframe
-            st.dataframe(rules.applymap(lambda x: ','.join(x) if type(x) == frozenset else x))
+                # Mengubah nilai support, confidence, dan lift menjadi persentase
+                rules[["antecedent support","consequent support","support","confidence"]] = rules[["antecedent support","consequent support","support","confidence"]].applymap(lambda x: "{:.2f}%".format(x*100))
+
+                # Menampilkan hasil algoritma apriori dalam bentuk dataframe
+                st.dataframe(rules.applymap(lambda x: ','.join(x) if type(x) == frozenset else x))
+                st.dataframe(tabular_encode)
+
+    elif sub_menu == 'Forecasting':
+        st.header('Forecasting')
