@@ -267,6 +267,7 @@ elif menu == 'Data Mining':
     elif sub_menu == 'Forecasting':
         st.header('Forecasting')
         st.warning('BELUM FIX')
+        average = st.number_input('Masukan Jumlah Rentang',0)
         query = "SELECT nama FROM produk"
         df = pd.read_sql(query, cnx)
         nama_item = st.selectbox("Pilih produk ", df['nama'].tolist())
@@ -274,5 +275,5 @@ elif menu == 'Data Mining':
         df = pd.read_sql(query, cnx,params=(nama_item,))
         df.set_index('tanggal', inplace=True)
         df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
-        df['moving_avg'] = df['jumlah'].shift(1).rolling(window=3).mean()
+        df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
         st.dataframe(df)
