@@ -276,4 +276,5 @@ elif menu == 'Data Mining':
         df.set_index('tanggal', inplace=True)
         df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
         df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
+        df = df.fillna('')
         st.dataframe(df)
