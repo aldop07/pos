@@ -273,5 +273,6 @@ elif menu == 'Data Mining':
         query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = ?"
         df = pd.read_sql(query, cnx,params=(nama_item,))
         df.set_index('tanggal', inplace=True)
+        df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
         df['moving_avg'] = df['jumlah'].shift(1).rolling(window=3).mean()
         st.dataframe(df)
