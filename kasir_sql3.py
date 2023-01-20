@@ -229,21 +229,6 @@ elif menu == 'Data Mining':
             df['tanggal_nama_pelanggan'] = df['tanggal'].astype(str) +'-'+ df['nama_pelanggan']
             tabular = pd.crosstab(df['tanggal_nama_pelanggan'],df['nama'])
 
-
-
-            dta = pd.DataFrame(tabular)
-            download = dta.to_excel
-            if download :
-                    with open("Tabulasi.xlsx", "wb") as f: # buka file Tabulasi.xls dalam mode binary write
-
-                        dta.to_excel(f) # menulis dataframe dta ke file excel
-
-                    with open("Tabulasi.xlsx", "rb") as f: #buka file Tabulasi.xls dalam mode binary read
-
-                        excel_file = f.read() #membaca data biner
-
-                    st.download_button(label="Download Excel", data=excel_file, file_name="Tabulasi.xlsx", mime='text/xlsx')
-
             # Encoding data
             def hot_encode(x) :
                 if (x<=0):
