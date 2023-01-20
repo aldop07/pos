@@ -5,7 +5,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mlxtend.frequent_patterns import apriori, association_rules
-
+import fitz
+import requests
+from PIL import Image
 
 #   IRFAN NOVALDO HUANG
 
@@ -19,14 +21,11 @@ st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
 st.title('Aplikasi Point Of Sale')
 # Buat sidebar dan menu dropdown
 st.sidebar.header('Menu')
-menu = st.sidebar.selectbox('', ['Dokumentasi', 'Daftar Produk', 'Tambah Produk', 'Tambah Transaksi', 'Tambah Pengeluaran', 'Laba', 'Riwayat Transaksi','Data Mining'])
-
+menu = st.sidebar.selectbox('', ['Dokumentasi','Daftar Produk', 'Tambah Produk', 'Tambah Transaksi', 'Tambah Pengeluaran', 'Laba', 'Riwayat Transaksi','Data Mining'])
 # Tampilan menu Dokumentasi
 if menu == 'Dokumentasi':
     st.header('Dokumentasi')
     st.write('https://ejournal.bsi.ac.id/ejurnal/index.php/khatulistiwa/article/viewFile/8994/4535')
-    st.write('https://publikasi.dinus.ac.id/index.php/technoc/article/download/1273/951')
-    st.write('https://jurnal.umj.ac.id/index.php/jurtek/article/download/992/967')
     #pdf_url = "https://ejournal.bsi.ac.id/ejurnal/index.php/khatulistiwa/article/viewFile/8994/4535"
 
     #response = requests.get(pdf_url)
@@ -39,8 +38,6 @@ if menu == 'Dokumentasi':
     #        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
     #        st.image(img, width=600)
 
-            
-# Tampilan menu Daftar Produk
 elif menu == 'Daftar Produk':
     st.header('Daftar Produk')
     query = 'SELECT nama, harga, stok FROM produk'
@@ -57,8 +54,7 @@ elif menu == 'Daftar Produk':
 
     # Tambahkan form input untuk mengubah stok produk
     st.header('Update Stok Produk')
-    list_produk = ['Pilih Produk'] + list(df['nama'])
-    produk = st.selectbox('Produk', list_produk)
+    produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
     stok_produk = st.number_input('Stok Produk',0)
     if st.button('Update'):
             cursor = cnx.cursor()
@@ -97,8 +93,7 @@ elif menu == 'Tambah Transaksi':
     # Buat list nama produk untuk dipilih dalam form input transaksi
     tanggal = st.date_input('Tanggal')
     nama_pelanggan = st.text_input ('Nama Pelanggan')
-    list_nama_produk = ['Pilih Produk'] + list(df['nama'])
-    nama_produk = st.selectbox('Nama Produk', list_nama_produk)
+    nama_produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
     jumlah_produk = st.number_input('Jumlah Produk',0)
     if jumlah_produk == 0:
         st.error('Jumlah produk tidak boleh 0')
@@ -197,13 +192,16 @@ elif menu == 'Riwayat Transaksi':
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
         fig = px.bar(df, x='tanggal', y='jumlah_penjualan')
         fig.update_layout(autosize=True)
+        fig.update_layout(width=800, height=400)
         st.plotly_chart(fig)
+
 
     if tanggal_mulai and tanggal_akhir:
         query = "SELECT nama, tanggal, SUM(jumlah) as jumlah_penjualan FROM transaksi WHERE tanggal BETWEEN ? AND ? GROUP BY nama, date(tanggal)"
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
         df = df.pivot(index='tanggal', columns='nama', values='jumlah_penjualan').fillna(0)
-        st.line_chart(df)
+        st.line_chart(df, width=800, height=400)
+
 
             
 # Tampilan menu Data Mining
@@ -233,7 +231,22 @@ elif menu == 'Data Mining':
             # Mengubah data menjadi tabulasi
             df['tanggal_nama_pelanggan'] = df['tanggal'].astype(str) +'-'+ df['nama_pelanggan']
             tabular = pd.crosstab(df['tanggal_nama_pelanggan'],df['nama'])
-            
+
+
+
+            dta = pd.DataFrame(tabular)
+            download = dta.to_excel
+            if download :
+                    with open("Tabulasi.xlsx", "wb") as f: # buka file Tabulasi.xls dalam mode binary write
+
+                        dta.to_excel(f) # menulis dataframe dta ke file excel
+
+                    with open("Tabulasi.xlsx", "rb") as f: #buka file Tabulasi.xls dalam mode binary read
+
+                        excel_file = f.read() #membaca data biner
+
+                    st.download_button(label="Download Excel", data=excel_file, file_name="Tabulasi.xlsx", mime='text/xlsx')
+
             # Encoding data
             def hot_encode(x) :
                 if (x<=0):
@@ -268,7 +281,15 @@ elif menu == 'Data Mining':
 
                 # Menampilkan hasil algoritma apriori dalam bentuk dataframe
                 st.dataframe(rules.applymap(lambda x: ','.join(x) if type(x) == frozenset else x))
-                st.dataframe(tabular_encode)
 
     elif sub_menu == 'Forecasting':
         st.header('Forecasting')
+        st.warning('BELUM FIX')
+        query = "SELECT nama FROM produk"
+        df = pd.read_sql(query, cnx)
+        nama_item = st.selectbox("Pilih produk ", df['nama'].tolist())
+        query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = ?"
+        df = pd.read_sql(query, cnx,params=(nama_item,))
+        df.set_index('tanggal', inplace=True)
+        df['moving_avg'] = df['jumlah'].shift(1).rolling(window=3).mean()
+        st.dataframe(df)
