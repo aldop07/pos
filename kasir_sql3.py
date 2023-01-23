@@ -187,7 +187,7 @@ elif menu == 'Laba':
         result = cursor.fetchone()
         modal_now = result[0]
         modal_now = 'Rp. {:,}'.format(modal_now).replace(',', '.')
-        st.write('Seluruh Modal Saat Ini:', modal_now)
+        st.write('Seluruh Modal Barang Tersisa:', modal_now)
     else:
         st.warning('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN')
 
