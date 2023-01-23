@@ -276,7 +276,7 @@ elif menu == 'Data Mining':
                 frq_items = apriori(tabular_encode, min_support=minimum_support, use_colnames= True)
 
                 # Mengumpulkan aturan dalam dataframe
-                rules = association_rules(frq_items, metric="lift",min_threshold=minimum_confidence)
+                rules = association_rules(frq_items, metric="confidence",min_threshold=minimum_confidence)
                 rules = rules.sort_values(['confidence','lift'], ascending=[False, False])
                 # Mengubah nilai support, confidence, dan lift menjadi persentase
                 rules[["antecedent support","consequent support","support","confidence"]] = rules[["antecedent support","consequent support","support","confidence"]].applymap(lambda x: "{:.2f}%".format(x*100))
