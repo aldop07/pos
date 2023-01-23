@@ -55,7 +55,7 @@ elif menu == 'Daftar Produk':
     stok_produk = st.number_input('Stok Produk',0)
     if st.button('Update') and stok_produk < 1:
             st.warning('Input dengan teliti')
-        else:
+    else:
             cursor = cnx.cursor()
             query_select = 'SELECT stok FROM produk WHERE nama = ?'
             cursor.execute(query_select, (produk,))
