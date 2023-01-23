@@ -180,6 +180,14 @@ elif menu == 'Laba':
         laba = pemasukan - total_pengeluaran
         laba_rupiah = 'Rp. {:,}'.format(laba).replace(',', '.')
         st.write('Laba Bersih:', laba_rupiah)
+        
+        # Hitung modal total saat ini
+        query = 'SELECT SUM(harga_pokok * stok) FROM produk'
+        cursor.execute(query)
+        result = cursor.fetchone()
+        modal_now = result[0]
+        modal_now = 'Rp. {:,}'.format(modal_now).replace(',', '.')
+        st.write('Seluruh Modal Saat Ini:', modal_now)
     else:
         st.warning('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN')
 
