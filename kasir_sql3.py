@@ -53,9 +53,7 @@ elif menu == 'Daftar Produk':
     st.header('Update Stok Produk')
     produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
     stok_produk = st.number_input('Stok Produk',0)
-    if st.button('Update') and stok_produk < 1:
-            st.warning('Input dengan teliti')
-    else:
+    if st.button('Update') and stok_produk >= 1:
             cursor = cnx.cursor()
             query_select = 'SELECT stok FROM produk WHERE nama = ?'
             cursor.execute(query_select, (produk,))
@@ -66,6 +64,8 @@ elif menu == 'Daftar Produk':
             cursor.execute(query_update, (stok_baru, produk))
             cnx.commit()
             st.success('Stok produk berhasil diubah')
+    else:
+        st.warning('Input dengan teliti')
 
 # Tampilan menu Tambah Produk
 elif menu == 'Tambah Produk':
