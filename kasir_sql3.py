@@ -97,11 +97,13 @@ elif menu == 'Tambah Transaksi':
     nama_pelanggan = st.text_input ('Nama Pelanggan')
     nama_produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
     jumlah_produk = st.number_input('Jumlah Produk',0)
-    if jumlah_produk == 0:
-        st.error('Jumlah produk tidak boleh 0')
-    else:   
-        if st.button('Simpan'):
-        # Buat objek cursor
+    if st.button('Simpan'):
+
+        if nama_pelanggan == "" or jumlah_produk == 0:
+            st.warning("Periksa Nama Pelanggan dan Jumlah Produk")
+        else:
+            
+            # Buat objek cursor
             cursor = cnx.cursor()
             query = 'SELECT harga, stok FROM produk WHERE nama = ?'
             cursor.execute(query, (nama_produk,))
