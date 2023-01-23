@@ -53,7 +53,7 @@ elif menu == 'Daftar Produk':
     st.header('Update Stok Produk')
     produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
     stok_produk = st.number_input('Stok Produk',0)
-    if st.button('Update') and produk == 0:
+    if st.button('Update') and produk < 1:
             st.warning('Input dengan teliti')
     else:
             cursor = cnx.cursor()
