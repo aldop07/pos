@@ -248,9 +248,9 @@ elif menu == 'Riwayat Transaksi':
 elif menu == 'Data Mining':
     st.header('Data Mining')
     # Sub Menu untuk data mining
-    sub_menu = st.selectbox('', ['Market Basket Analisys', 'Forecasting'])
-    if sub_menu == 'Market Basket Analisys':
-        st.header('Market Basket Analisys')
+    sub_menu = st.selectbox('', ['Market Basket Analysis', 'Forecasting'])
+    if sub_menu == 'Market Basket Analysis':
+        st.header('Market Basket Analysis')
 
         # Ambil data produk dari database MySQL
         query = 'SELECT * FROM produk'
