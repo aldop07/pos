@@ -93,7 +93,10 @@ elif menu == 'Daftar Produk':
         # Tambahkan form input untuk mengubah stok produk
         produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
         stok_produk = st.number_input('Stok Produk',0)
-        if st.button('Update') and stok_produk >= 1:
+        if st.button('Update'):
+            if stok_produk < 1:
+                st.error('produk tidak dapat di update')
+            else:
                 cursor = cnx.cursor()
                 query_select = 'SELECT stok FROM produk WHERE nama = ?'
                 cursor.execute(query_select, (produk,))
