@@ -60,33 +60,61 @@ elif menu == 'Daftar Produk':
 
     # Tampilkan stok dalam bentuk angka tanpa desimal
     df['stok'] = df['stok'].apply(lambda x: int(x) if x == x else x)
+    col1, col2 = st.columns(2)
+    # Tampilkan stok dalam bentuk dataframe
+    with col1:
+        st.dataframe(df, width=1500, height=250)
 
-    # Tampikan stok dalam bentuk dataframe
-    st.dataframe(df)
+    # Tampilkan menu edit produk apabila di centang
+    edit = st.checkbox('Edit Produk')
+    if edit :
+        produk = st.selectbox("Pilih Produk", df['nama'].tolist())
+        query = 'SELECT harga_pokok, nama, harga, stok FROM produk'
+        df = pd.read_sql(query, cnx)
+        nama = st.text_input("Nama Baru",value=df.loc[df['nama'] == produk, 'nama'].values[0])
+        harga_pokok = st.number_input("Harga Pokok Baru",value=df.loc[df['nama'] == produk, 'harga_pokok'].values[0])
+        harga = st.number_input("Harga Baru",value=df.loc[df['nama'] == produk, 'harga'].values[0])
+        stok = st.number_input("Stok Baru",value=df.loc[df['nama'] == produk, 'stok'].values[0])
 
-    # Tambahkan form input untuk mengubah stok produk
-    st.header('Update Stok Produk')
-    produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
-    stok_produk = st.number_input('Stok Produk',0)
-    if st.button('Update') and stok_produk >= 1:
-            cursor = cnx.cursor()
-            query_select = 'SELECT stok FROM produk WHERE nama = ?'
-            cursor.execute(query_select, (produk,))
-            result = cursor.fetchone()
-            stok_lama = result[0]
-            stok_baru = stok_lama + stok_produk
-            query_update = 'UPDATE produk SET stok = ? WHERE nama = ?'
-            cursor.execute(query_update, (stok_baru, produk))
-            cnx.commit()
-            st.success('Stok produk berhasil diubah')
+        if st.button("Edit"):
+            if nama == "" or harga_pokok == 0 or harga == 0 or stok == 0:
+                st.error('Data produk tidak berhasil diubah')
+            else:
+                # Query untuk mengubah data di tabel produk
+                cursor = cnx.cursor()
+                query = "UPDATE produk SET harga_pokok = ?, nama = ?, harga = ?, stok = ? WHERE nama = ?"
+                cursor.execute(query, (harga_pokok, nama, harga, stok, produk))
+                cnx.commit()
+            
+                # Tampilkan pesan sukses
+                st.success("Data produk berhasil diubah")
+
+    with col2:
+        # Tambahkan form input untuk mengubah stok produk
+        produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
+        stok_produk = st.number_input('Stok Produk',0)
+        if st.button('Update') and stok_produk >= 1:
+                cursor = cnx.cursor()
+                query_select = 'SELECT stok FROM produk WHERE nama = ?'
+                cursor.execute(query_select, (produk,))
+                result = cursor.fetchone()
+                stok_lama = result[0]
+                stok_baru = stok_lama + stok_produk
+                query_update = 'UPDATE produk SET stok = ? WHERE nama = ?'
+                cursor.execute(query_update, (stok_baru, produk))
+                cnx.commit()
+                st.success('Stok produk berhasil diubah')
 
 # Tampilan menu Tambah Produk
 elif menu == 'Tambah Produk':
     st.header('Tambah Produk')
-    nama_produk = st.text_input('Nama Produk')
-    harga_produk = st.number_input('Harga Jual',0)
-    harga_pokok = st.number_input('Harga Pokok',0)
-    stok_produk = st.number_input('Stok Produk',0)
+    col1, col2 = st.columns(2)
+    with col1:
+        nama_produk = st.text_input('Nama Produk')
+        harga_produk = st.number_input('Harga Jual',0)
+    with col2:
+        harga_pokok = st.number_input('Harga Pokok',0)
+        stok_produk = st.number_input('Stok Produk',0)
     if st.button('Simpan'):
         if nama_produk == "" or harga_pokok < 1000 or harga_produk < 1000 :
             st.warning('Input dengan benar')
@@ -104,49 +132,52 @@ elif menu == 'Tambah Transaksi':
     # Ambil data produk dari database MySQL
     query = 'SELECT * FROM produk'
     df = pd.read_sql(query, cnx)
-   
+    col1, col2, col3 = st.columns(3)
     # Buat list nama produk untuk dipilih dalam form input transaksi
-    tanggal = st.date_input('Tanggal')
-    nama_pelanggan = st.text_input ('Nama Pelanggan')
-    nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
-    jumlah_produk = []
-    total_harga = 0
-    for produk in nama_produk:
-        jumlah = st.number_input(f'Jumlah Produk {produk}',min_value=0)
-        jumlah_produk.append(jumlah)
-
-    if st.button('Simpan'):
-        if nama_pelanggan == "" or sum(jumlah_produk) == 0 or 0 in jumlah_produk:
-            st.warning("Periksa Nama Pelanggan dan Jumlah Produk")
-        else:
-            # Buat objek cursor
-            cursor = cnx.cursor()
-            transaksi_berhasil = True
-            produk_stok_tidak_mencukupi = []
-            for i in range(len(nama_produk)):
-                query = 'SELECT harga, stok FROM produk WHERE nama = ?'
-                cursor.execute(query, (nama_produk[i],))
-                result = cursor.fetchone()
-                harga_produk = result[0]
-                stok_produk = result[1]
-                total_harga = harga_produk * jumlah_produk[i]
-                if stok_produk >= jumlah_produk[i]:
-                    # Tambahkan transaksi baru ke tabel transaksi
-                    query = 'INSERT INTO transaksi (tanggal, nama_pelanggan, nama, jumlah, harga, total) VALUES (?, ?, ?, ?, ?, ?)'
-                    cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, total_harga))
-                else:
-                    transaksi_berhasil = False
-                    produk_stok_tidak_mencukupi.append(nama_produk[i])
-
-            if transaksi_berhasil:
-                cnx.commit()
-                st.success('Transaksi berhasil disimpan')
+    with col1:
+        tanggal = st.date_input('Tanggal')
+        nama_pelanggan = st.text_input ('Nama Pelanggan')
+    with col2:
+        nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
+        jumlah_produk = []
+        total_harga = 0
+    with col2 , col3:
+        for produk in nama_produk:
+            jumlah = st.number_input(f'Jumlah Produk {produk}',min_value=0)
+            jumlah_produk.append(jumlah)
+    with col1:
+        if st.button('Simpan'):
+            if nama_pelanggan == "" or sum(jumlah_produk) == 0 or 0 in jumlah_produk:
+                st.warning("Periksa Nama Pelanggan dan Jumlah Produk")
             else:
-                cnx.rollback()
-                if len(produk_stok_tidak_mencukupi) == 1:
-                    st.error(f'Stok produk {produk_stok_tidak_mencukupi[0]} tidak mencukupi')
+                # Buat objek cursor
+                cursor = cnx.cursor()
+                transaksi_berhasil = True
+                produk_stok_tidak_mencukupi = []
+                for i in range(len(nama_produk)):
+                    query = 'SELECT harga, stok FROM produk WHERE nama = ?'
+                    cursor.execute(query, (nama_produk[i],))
+                    result = cursor.fetchone()
+                    harga_produk = result[0]
+                    stok_produk = result[1]
+                    total_harga = harga_produk * jumlah_produk[i]
+                    if stok_produk >= jumlah_produk[i]:
+                        # Tambahkan transaksi baru ke tabel transaksi
+                        query = 'INSERT INTO transaksi (tanggal, nama_pelanggan, nama, jumlah, harga, total) VALUES (?, ?, ?, ?, ?, ?)'
+                        cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, total_harga))
+                    else:
+                        transaksi_berhasil = False
+                        produk_stok_tidak_mencukupi.append(nama_produk[i])
+
+                if transaksi_berhasil:
+                    cnx.commit()
+                    st.success('Transaksi berhasil disimpan')
                 else:
-                    st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
+                    cnx.rollback()
+                    if len(produk_stok_tidak_mencukupi) == 1:
+                        st.error(f'Stok produk {produk_stok_tidak_mencukupi[0]} tidak mencukupi')
+                    else:
+                        st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
 
 # Tampilan menu Tambah Pengeluaran
 elif menu == 'Tambah Pengeluaran':
@@ -167,8 +198,11 @@ elif menu == 'Tambah Pengeluaran':
 # Tampilan menu Laba
 elif menu == 'Laba':
     st.header('Laba')
-    tanggal_awal = st.date_input('Tanggal Awal')
-    tanggal_akhir = st.date_input('Tanggal Akhir')
+    col1, col2 = st.columns(2)
+    with col1:
+        tanggal_awal = st.date_input('Tanggal Awal')
+    with col2:
+        tanggal_akhir = st.date_input('Tanggal Akhir')
     if st.button('CEK LABA'):
         
         # Hitung total pengeluaran
@@ -210,11 +244,12 @@ elif menu == 'Laba':
         modal_now = 'Rp. {:,}'.format(modal_now).replace(',', '.')
         st.write('Seluruh Modal Saat Ini:', modal_now)
     else:
-        st.info('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN')
+        st.info('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN DAN PEMASUKAN')
 
 # Tampilan menu Riwayat Transaksi
 elif menu == 'Riwayat Transaksi':
     st.header('Riwayat Transaksi')
+    col1, col2 = st.columns(2)
     query = 'SELECT tanggal, nama, jumlah, harga, total FROM transaksi'
     df = pd.read_sql(query, cnx)
     df = df.sort_values(by='tanggal', ascending=False)
@@ -222,12 +257,13 @@ elif menu == 'Riwayat Transaksi':
     # Tampilkan harga dan total dalam bentuk angka dengan tanda titik sebagai pemisah ribuan
     df['harga'] = df['harga'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
     df['total'] = df['total'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
-    st.dataframe(df)
+    with col1:
+        st.dataframe(df, width=2000, height=250)
 
-
-    # Buat grafik jumlah penjualan per bulan
-    tanggal_mulai = st.date_input('Tanggal Mulai')
-    tanggal_akhir = st.date_input('Tanggal Akhir')
+    with col2:
+        # Buat grafik jumlah penjualan per bulan
+        tanggal_mulai = st.date_input('Tanggal Mulai')
+        tanggal_akhir = st.date_input('Tanggal Akhir')
     if st.button('CEK GRAFIK'):
 
         # Grafik seluruh penjualan
@@ -248,10 +284,10 @@ elif menu == 'Riwayat Transaksi':
 elif menu == 'Data Mining':
     st.header('Data Mining')
     # Sub Menu untuk data mining
-    sub_menu = st.selectbox('', ['Market Basket Analysis', 'Forecasting'])
-    if sub_menu == 'Market Basket Analysis':
-        st.header('Market Basket Analysis')
-
+    sub_menu = st.selectbox('', ['Market Basket Analisys', 'Forecasting'])
+    if sub_menu == 'Market Basket Analisys':
+        st.header('Market Basket Analisys')
+        col1, col2 = st.columns(2)
         # Ambil data produk dari database MySQL
         query = 'SELECT * FROM produk'
         df = pd.read_sql(query, cnx)
@@ -263,12 +299,16 @@ elif menu == 'Data Mining':
         all = st.checkbox('Pilih hanya berdasarkan tanggal')
 
         # Input tanggal awal dan akhir
-        tanggal_mulai = st.date_input("Tanggal Mulai")
-        tanggal_akhir = st.date_input("Tanggal Akhir")
+        with col1:
+            tanggal_mulai = st.date_input("Tanggal Mulai")
+        with col1:
+            tanggal_akhir = st.date_input("Tanggal Akhir")
 
         # Mendefinisikan nilai minimum support dan minimum confidence
-        minimum_support = st.number_input("Nilai minimum support:",0.01)
-        minimum_confidence = st.number_input("Nilai minimum confidence:",0.01)
+        with col2:
+            minimum_support = st.number_input("Nilai minimum support:",0.01)
+        with col2:
+            minimum_confidence = st.number_input("Nilai minimum confidence:",0.01)
         
         # Membaca data transaksi dari database SQLite
         query = 'SELECT tanggal, nama_pelanggan, nama FROM transaksi WHERE tanggal BETWEEN ? AND ?'
@@ -322,10 +362,10 @@ elif menu == 'Data Mining':
     elif sub_menu == 'Forecasting':
         st.header('Forecasting')
         st.info('BELUM FIX')
-        average = st.number_input('Masukan Jumlah Rentang',min_value=1)
         query = "SELECT nama FROM produk"
         df = pd.read_sql(query, cnx)
         nama_item = st.selectbox("Pilih produk ", df['nama'].tolist())
+        average = st.number_input('Masukan Jumlah Rentang',min_value=1) 
         if st.button('CEK FORECASTING'):
             query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = ?"
             df = pd.read_sql(query, cnx,params=(nama_item,))
