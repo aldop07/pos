@@ -278,11 +278,11 @@ elif menu == 'Data Mining':
         # Input tanggal awal dan akhir
         with col1:
             tanggal_mulai = st.date_input("Tanggal Mulai")
-        with col2:
+        with col1:
             tanggal_akhir = st.date_input("Tanggal Akhir")
 
         # Mendefinisikan nilai minimum support dan minimum confidence
-        with col1:
+        with col2:
             minimum_support = st.number_input("Nilai minimum support:",0.01)
         with col2:
             minimum_confidence = st.number_input("Nilai minimum confidence:",0.01)
