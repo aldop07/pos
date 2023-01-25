@@ -108,6 +108,7 @@ elif menu == 'Tambah Transaksi':
         else:
             # Buat objek cursor
             cursor = cnx.cursor()
+            transaksi_berhasil = True
             for i in range(len(nama_produk)):
                 query = 'SELECT harga, stok FROM produk WHERE nama = ?'
                 cursor.execute(query, (nama_produk[i],))
@@ -117,6 +118,7 @@ elif menu == 'Tambah Transaksi':
                 total_harga_produk = harga_produk * jumlah_produk[i]
                 if stok_produk < jumlah_produk[i]:
                     st.error('Stok produk tidak mencukupi')
+                    cnx.rollback()
                     break
                 else:
                     # Tambahkan transaksi baru ke tabel transaksi
