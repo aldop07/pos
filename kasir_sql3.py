@@ -91,39 +91,43 @@ elif menu == 'Tambah Transaksi':
     # Ambil data produk dari database MySQL
     query = 'SELECT * FROM produk'
     df = pd.read_sql(query, cnx)
-   
+
     # Buat list nama produk untuk dipilih dalam form input transaksi
     tanggal = st.date_input('Tanggal')
     nama_pelanggan = st.text_input ('Nama Pelanggan')
-    nama_produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
-    jumlah_produk = st.number_input('Jumlah Produk',0)
-    if st.button('Simpan'):
+    nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
+    jumlah_produk = []
+    total_harga = 0
+    for produk in nama_produk:
+        jumlah = st.number_input(f'Jumlah Produk {produk}',min_value=1)
+        jumlah_produk.append(jumlah)
 
-        if nama_pelanggan == "" or jumlah_produk == 0:
+    if st.button('Simpan'):
+        if nama_pelanggan == "":
             st.warning("Periksa Nama Pelanggan dan Jumlah Produk")
         else:
-            
             # Buat objek cursor
             cursor = cnx.cursor()
-            query = 'SELECT harga, stok FROM produk WHERE nama = ?'
-            cursor.execute(query, (nama_produk,))
-            result = cursor.fetchone()
-            harga_produk = result[0]
-            stok_produk = result[1]
-            total_harga = harga_produk * jumlah_produk
-            if stok_produk >= jumlah_produk:
-                
-                # Tambahkan transaksi baru ke tabel transaksi
-                query = 'INSERT INTO transaksi (tanggal, nama_pelanggan, nama, jumlah, harga, total) VALUES (?, ?, ?, ?, ?, ?)'
-                cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk, jumlah_produk, harga_produk, total_harga))
-            
-                # Kurangi stok produk yang dibeli
-                query = 'UPDATE produk SET stok = stok - ? WHERE nama = ?'
-                cursor.execute(query, (jumlah_produk, nama_produk))
-                cnx.commit()
-                st.success('Transaksi berhasil disimpan')
-            else:
-                st.error('Stok produk tidak mencukupi')
+            for i in range(len(nama_produk)):
+                query = 'SELECT harga, stok FROM produk WHERE nama = ?'
+                cursor.execute(query, (nama_produk[i],))
+                result = cursor.fetchone()
+                harga_produk = result[0]
+                stok_produk = result[1]
+                total_harga_produk = harga_produk * jumlah_produk[i]
+                if stok_produk < jumlah_produk[i]:
+                    st.error('Stok produk tidak mencukupi')
+                    break
+                else:
+                    # Tambahkan transaksi baru ke tabel transaksi
+                    query = 'INSERT INTO transaksi (tanggal, nama_pelanggan, nama, jumlah, harga, total) VALUES (?, ?, ?, ?, ?, ?)'
+                    cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, total_harga_produk))
+
+                    # Kurangi stok produk yang dibeli
+                    query = 'UPDATE produk SET stok = stok - ? WHERE nama = ?'
+                    cursor.execute(query, (jumlah_produk[i], nama_produk[i]))
+            cnx.commit()
+            st.success('Transaksi berhasil disimpan')
 
 # Tampilan menu Tambah Pengeluaran
 # Tampilan menu Tambah Pengeluaran
