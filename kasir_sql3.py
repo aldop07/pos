@@ -231,64 +231,62 @@ elif menu == 'Riwayat Transaksi':
 # Tampilan menu Data Mining
 elif menu == 'Data Mining':
     st.header('Data Mining')
-
     # Sub Menu untuk data mining
-    sub_menu = st.selectbox('', ['Association Rule', 'Forecasting'])
-    if sub_menu == 'Association Rule':
-        st.header('Association Rule')
-        # Input produk
-        
+    sub_menu = st.selectbox('', ['Market Basket Analisys', 'Forecasting'])
+    if sub_menu == 'Market Basket Analisys':
+        st.header('Market Basket Analisys')
+
+        # Ambil data produk dari database MySQL
+        query = 'SELECT * FROM produk'
+        df = pd.read_sql(query, cnx)
+
+        # Input Nama produk
+        nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
+
+        # Ceklis jika ingin memilih hanya berdasarkan tanggal
+        all = st.checkbox('Pilih hanya berdasarkan tanggal')
+
         # Input tanggal awal dan akhir
         tanggal_mulai = st.date_input("Tanggal Mulai")
         tanggal_akhir = st.date_input("Tanggal Akhir")
+
         # Mendefinisikan nilai minimum support dan minimum confidence
         minimum_support = st.number_input("Nilai minimum support:",0.01)
         minimum_confidence = st.number_input("Nilai minimum confidence:",0.01)
         
-        #if tanggal_mulai and tanggal_akhir:
-            # Membaca data transaksi dari database SQLite
+        # Membaca data transaksi dari database SQLite
         query = 'SELECT tanggal, nama_pelanggan, nama FROM transaksi WHERE tanggal BETWEEN ? AND ?'
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
-
-            # Mengubah tanggal yang ditampilkan  dataframe menjadi objek datatime
+        
+        # Mengubah tanggal yang ditampilkan  dataframe menjadi objek datatime
         df['tanggal'] = pd.to_datetime(df['tanggal'])
 
-            # Memfilter data transaksi berdasarkan tanggal mulai dan akhir
+        # Memfilter data transaksi berdasarkan tanggal mulai dan akhir
         df = df[(df['tanggal'] >= pd.to_datetime(tanggal_mulai)) & (df['tanggal'] <= pd.to_datetime(tanggal_akhir))]
-            
-            # Mengubah data menjadi tabulasi
+        
+        # Memfilter data transaksi berdasarkan nama produk
+        if all:
+            pass # jangan lakukan apapun jika all dicentang
+        else:
+            df = df[df['nama'].isin(nama_produk)]   
+        
+        # Mengubah data menjadi tabulasi
         df['tanggal_nama_pelanggan'] = df['tanggal'].astype(str) +'-'+ df['nama_pelanggan']
         tabular = pd.crosstab(df['tanggal_nama_pelanggan'],df['nama'])
 
-
-            #dta = pd.DataFrame(tabular)
-            #download = dta.to_excel
-            #if download :
-            #        with open("Tabulasi.xlsx", "wb") as f: # buka file Tabulasi.xls dalam mode binary write
-
-             #           dta.to_excel(f) # menulis dataframe dta ke file excel
-
-              #      with open("Tabulasi.xlsx", "rb") as f: #buka file Tabulasi.xls dalam mode binary read
-
-               #         excel_file = f.read() #membaca data biner
-
-                #    st.download_button(label="Download Excel", data=excel_file, file_name="Tabulasi.xlsx", mime='text/xlsx')
-            #else:
-            #    st.warning('Input dengan teliti')
-            # Encoding data
+        # Encoding data
         def hot_encode(x) :
             if (x<=0):
                 return 0
             if (x>=1):
                 return 1
 
-            # Menampilkan hasil dari algoritma Apriori
+        # Menampilkan hasil dari algoritma Apriori
         if st.button("PROSES"):
                 st.success('HASIL PERHITUNGAN APRIORI')
-            # Mengubah data menjadi binominal
+                # Mengubah data menjadi binominal
                 tabular_encode = tabular.applymap(hot_encode)
 
-                
                 # Membuat model Apriori
                 frq_items = apriori(tabular_encode, min_support=minimum_support, use_colnames= True)
 
@@ -300,6 +298,7 @@ elif menu == 'Data Mining':
 
                 # Menampilkan hasil algoritma apriori dalam bentuk dataframe
                 st.dataframe(rules.applymap(lambda x: ','.join(x) if type(x) == frozenset else x))
+                st.dataframe(tabular)
 
     elif sub_menu == 'Forecasting':
         st.header('Forecasting')
