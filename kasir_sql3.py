@@ -17,7 +17,7 @@ st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
 
 st.title('Aplikasi Point Of Sale')
 # Buat sidebar dan menu dropdown
-st.sidebar.header('Menu')
+st.sidebar.header('Menu') 
 menu = st.sidebar.selectbox('', ['Dokumentasi','Daftar Produk', 'Tambah Produk', 'Tambah Transaksi', 'Tambah Pengeluaran', 'Laba', 'Riwayat Transaksi','Data Mining'])
 # Tampilan menu Dokumentasi
 if menu == 'Dokumentasi':
@@ -91,7 +91,7 @@ elif menu == 'Tambah Transaksi':
     # Ambil data produk dari database MySQL
     query = 'SELECT * FROM produk'
     df = pd.read_sql(query, cnx)
-
+   
     # Buat list nama produk untuk dipilih dalam form input transaksi
     tanggal = st.date_input('Tanggal')
     nama_pelanggan = st.text_input ('Nama Pelanggan')
@@ -99,39 +99,42 @@ elif menu == 'Tambah Transaksi':
     jumlah_produk = []
     total_harga = 0
     for produk in nama_produk:
-        jumlah = st.number_input(f'Jumlah Produk {produk}',min_value=1)
+        jumlah = st.number_input(f'Jumlah Produk {produk}',min_value=0)
         jumlah_produk.append(jumlah)
 
     if st.button('Simpan'):
-        if nama_pelanggan == "":
+        if nama_pelanggan == "" or sum(jumlah_produk) == 0 or 0 in jumlah_produk:
             st.warning("Periksa Nama Pelanggan dan Jumlah Produk")
         else:
             # Buat objek cursor
             cursor = cnx.cursor()
             transaksi_berhasil = True
+            produk_stok_tidak_mencukupi = []
             for i in range(len(nama_produk)):
                 query = 'SELECT harga, stok FROM produk WHERE nama = ?'
                 cursor.execute(query, (nama_produk[i],))
                 result = cursor.fetchone()
                 harga_produk = result[0]
                 stok_produk = result[1]
-                total_harga_produk = harga_produk * jumlah_produk[i]
-                if stok_produk < jumlah_produk[i]:
-                    st.error('Stok produk tidak mencukupi')
-                    cnx.rollback()
-                    break
-                else:
+                total_harga = harga_produk * jumlah_produk[i]
+                if stok_produk >= jumlah_produk[i]:
                     # Tambahkan transaksi baru ke tabel transaksi
                     query = 'INSERT INTO transaksi (tanggal, nama_pelanggan, nama, jumlah, harga, total) VALUES (?, ?, ?, ?, ?, ?)'
-                    cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, total_harga_produk))
+                    cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, total_harga))
+                else:
+                    transaksi_berhasil = False
+                    produk_stok_tidak_mencukupi.append(nama_produk[i])
 
-                    # Kurangi stok produk yang dibeli
-                    query = 'UPDATE produk SET stok = stok - ? WHERE nama = ?'
-                    cursor.execute(query, (jumlah_produk[i], nama_produk[i]))
-            cnx.commit()
-            st.success('Transaksi berhasil disimpan')
+            if transaksi_berhasil:
+                cnx.commit()
+                st.success('Transaksi berhasil disimpan')
+            else:
+                cnx.rollback()
+                if len(produk_stok_tidak_mencukupi) == 1:
+                    st.error(f'Stok produk {produk_stok_tidak_mencukupi[0]} tidak mencukupi')
+                else:
+                    st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
 
-# Tampilan menu Tambah Pengeluaran
 # Tampilan menu Tambah Pengeluaran
 elif menu == 'Tambah Pengeluaran':
     st.header('Tambah Pengeluaran')
@@ -139,7 +142,7 @@ elif menu == 'Tambah Pengeluaran':
     ket_pengeluaran = st.text_input('Keterangan Pengeluaran')
     jumlah_pengeluaran = st.number_input('Jumlah Pengeluaran',0)
     if st.button('Simpan'):
-        if ket_pengeluaran == "":
+        if ket_pengeluaran == "" and jumlah_pengeluaran == 0:
             st.warning("Sebutkan Keterangan Pengeluaran")
         else:
             cursor = cnx.cursor()
@@ -148,14 +151,13 @@ elif menu == 'Tambah Pengeluaran':
             cnx.commit()
             st.success('Pengeluaran berhasil disimpan')
         
-
 # Tampilan menu Laba
 elif menu == 'Laba':
     st.header('Laba')
     tanggal_awal = st.date_input('Tanggal Awal')
     tanggal_akhir = st.date_input('Tanggal Akhir')
     if st.button('CEK LABA'):
-
+        
     # Hitung total pengeluaran
         query = 'SELECT SUM(jumlah_pengeluaran) FROM pengeluaran WHERE tanggal BETWEEN ? AND ?'
         cursor = cnx.cursor()
@@ -186,16 +188,16 @@ elif menu == 'Laba':
         laba = pemasukan - total_pengeluaran
         laba_rupiah = 'Rp. {:,}'.format(laba).replace(',', '.')
         st.write('Laba Bersih:', laba_rupiah)
-        
+
         # Hitung modal total saat ini
         query = 'SELECT SUM(harga_pokok * stok) FROM produk'
         cursor.execute(query)
         result = cursor.fetchone()
         modal_now = result[0]
         modal_now = 'Rp. {:,}'.format(modal_now).replace(',', '.')
-        st.write('Seluruh Modal Barang Tersisa:', modal_now)
+        st.write('Seluruh Modal Saat Ini:', modal_now)
     else:
-        st.warning('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN')
+        st.info('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN')
 
 # Tampilan menu Riwayat Transaksi
 elif menu == 'Riwayat Transaksi':
@@ -224,9 +226,9 @@ elif menu == 'Riwayat Transaksi':
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
         df = df.pivot(index='tanggal', columns='nama', values='jumlah_penjualan').fillna(0)
         st.line_chart(df)
-    else:
-        st.warning('Input dengan teliti')
+
             
+# Tampilan menu Data Mining
 elif menu == 'Data Mining':
     st.header('Data Mining')
 
@@ -234,7 +236,8 @@ elif menu == 'Data Mining':
     sub_menu = st.selectbox('', ['Association Rule', 'Forecasting'])
     if sub_menu == 'Association Rule':
         st.header('Association Rule')
-    
+        # Input produk
+        
         # Input tanggal awal dan akhir
         tanggal_mulai = st.date_input("Tanggal Mulai")
         tanggal_akhir = st.date_input("Tanggal Akhir")
@@ -297,8 +300,6 @@ elif menu == 'Data Mining':
 
                 # Menampilkan hasil algoritma apriori dalam bentuk dataframe
                 st.dataframe(rules.applymap(lambda x: ','.join(x) if type(x) == frozenset else x))
-        else:
-                st.warning('Input dengan teliti')
 
     elif sub_menu == 'Forecasting':
         st.header('Forecasting')
@@ -315,5 +316,3 @@ elif menu == 'Data Mining':
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
             df = df.sort_values(by='tanggal', ascending=False)
             st.dataframe(df)
-        else:
-            st.warning('Input dengan teliti')
