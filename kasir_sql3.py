@@ -61,9 +61,33 @@ elif menu == 'Daftar Produk':
     # Tampilkan stok dalam bentuk angka tanpa desimal
     df['stok'] = df['stok'].apply(lambda x: int(x) if x == x else x)
     col1, col2 = st.columns(2)
-    # Tampikan stok dalam bentuk dataframe
+    # Tampilkan stok dalam bentuk dataframe
     with col1:
         st.dataframe(df, width=1500, height=250)
+
+    # Tampilkan menu edit produk apabila di centang
+    edit = st.checkbox('Edit Produk')
+    if edit :
+        produk = st.selectbox("Pilih Produk", df['nama'].tolist())
+        query = 'SELECT harga_pokok, nama, harga, stok FROM produk'
+        df = pd.read_sql(query, cnx)
+        nama = st.text_input("Nama Baru",value=df.loc[df['nama'] == produk, 'nama'].values[0])
+        harga_pokok = st.number_input("Harga Pokok Baru",value=df.loc[df['nama'] == produk, 'harga_pokok'].values[0])
+        harga = st.number_input("Harga Baru",value=df.loc[df['nama'] == produk, 'harga'].values[0])
+        stok = st.number_input("Stok Baru",value=df.loc[df['nama'] == produk, 'stok'].values[0])
+
+        if st.button("Edit"):
+            if nama == "" or harga_pokok == 0 or harga == 0 or stok == 0:
+                st.error('Data produk tidak berhasil diubah')
+            else:
+                # Query untuk mengubah data di tabel produk
+                cursor = cnx.cursor()
+                query = "UPDATE produk SET harga_pokok = ?, nama = ?, harga = ?, stok = ? WHERE nama = ?"
+                cursor.execute(query, (harga_pokok, nama, harga, stok, produk))
+                cnx.commit()
+            
+                # Tampilkan pesan sukses
+                st.success("Data produk berhasil diubah")
 
     with col2:
         # Tambahkan form input untuk mengubah stok produk
