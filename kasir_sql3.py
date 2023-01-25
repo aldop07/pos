@@ -22,7 +22,22 @@ menu = st.sidebar.selectbox('', ['Dokumentasi','Daftar Produk', 'Tambah Produk',
 # Tampilan menu Dokumentasi
 if menu == 'Dokumentasi':
     st.header('Dokumentasi')
+    st.info('Baca jurnal berikut terlebih dahulu')
     st.write('https://ejournal.bsi.ac.id/ejurnal/index.php/khatulistiwa/article/viewFile/8994/4535')
+    st.write('http://jim.teknokrat.ac.id/index.php/sisteminformasi/article/download/368/207')
+    st.write('https://jurnal.ulb.ac.id/index.php/informatika/article/view/1381')
+    
+    st.markdown(':red[Penjelasan dan Rumus]')
+    st.write('Dalam Apriori, support digunakan untuk mengukur seberapa sering suatu itemset muncul dalam data transaksi. Rumus untuk menentukan support adalah jumlah transaksi yang mengandung itemset tersebut dibagi dengan total jumlah transaksi.')
+    st.markdown(':green[support(I) = (jumlah transaksi yang mengandung itemset I) / (total jumlah transaksi])')
+    st.write('Di mana I adalah itemset yang ingin ditentukan support-nya.')
+    st.write('Jadi, dengan rumus ini kita dapat menentukan support dari suatu item atau itemset dalam data transaksi dengan menghitung berapa banyak transaksi yang mengandung item atau itemset tersebut dan membaginya dengan total jumlah transaksi.')
+    st.write('Rumus untuk menentukan support dari itemset yang terdiri dari 2 item adalah:')
+    st.markdown(':green[support(I1, I2) = (jumlah transaksi yang mengandung item I1 dan I2) / (total jumlah transaksi])')
+    st.write('Di mana I1 dan I2 adalah 2 item yang digabungkan dalam suatu itemset yang ingin ditentukan support-nya.')
+    st.write('Confidence adalah ukuran seberapa sering suatu itemset yang didahului oleh suatu item atau itemset lain muncul dalam data transaksi. Rumus untuk menentukan confidence dari suatu aturan asosiasi I1 -> I2 adalah :')
+    st.markdown(':green[Confidence(I1 -> I2) = Support (I1, I2) / Support (I1])')
+    st.write('Di mana I1 adalah item atau itemset yang didahului, I2 adalah item atau itemset yang diikuti, Support (I1, I2) adalah support dari itemset yang terdiri dari kedua item atau itemset tersebut, dan Support (I1) adalah support dari item atau itemset yang didahului.')
     #pdf_url = "https://ejournal.bsi.ac.id/ejurnal/index.php/khatulistiwa/article/viewFile/8994/4535"
 
     #response = requests.get(pdf_url)
@@ -64,8 +79,6 @@ elif menu == 'Daftar Produk':
             cursor.execute(query_update, (stok_baru, produk))
             cnx.commit()
             st.success('Stok produk berhasil diubah')
-    else:
-        st.warning('Input dengan teliti')
 
 # Tampilan menu Tambah Produk
 elif menu == 'Tambah Produk':
@@ -158,7 +171,7 @@ elif menu == 'Laba':
     tanggal_akhir = st.date_input('Tanggal Akhir')
     if st.button('CEK LABA'):
         
-    # Hitung total pengeluaran
+        # Hitung total pengeluaran
         query = 'SELECT SUM(jumlah_pengeluaran) FROM pengeluaran WHERE tanggal BETWEEN ? AND ?'
         cursor = cnx.cursor()
         cursor.execute(query, (tanggal_awal, tanggal_akhir))
@@ -216,13 +229,14 @@ elif menu == 'Riwayat Transaksi':
     tanggal_mulai = st.date_input('Tanggal Mulai')
     tanggal_akhir = st.date_input('Tanggal Akhir')
     if st.button('CEK GRAFIK'):
+
         # Grafik seluruh penjualan
         query = "SELECT date(tanggal) as tanggal, SUM(jumlah) as jumlah_penjualan FROM transaksi WHERE tanggal BETWEEN ? AND ? GROUP BY date(tanggal)"
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
         fig = px.bar(df, x='tanggal', y='jumlah_penjualan')
         fig.update_layout(autosize=True)
         st.plotly_chart(fig)
-        
+
         # Grafik penjualan berdasarkan produk
         query = "SELECT nama, tanggal, SUM(jumlah) as jumlah_penjualan FROM transaksi WHERE tanggal BETWEEN ? AND ? GROUP BY nama, date(tanggal)"
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
@@ -270,10 +284,12 @@ elif menu == 'Data Mining':
         if all:
             pass # jangan lakukan apapun jika all dicentang
         else:
-            df = df[df['nama'].isin(nama_produk)]   
+            df = df[df['nama'].isin(nama_produk)]  # lakukan sesuai nama produk yang akan di filter
         
-        # Mengubah data menjadi tabulasi
+        # Menggabungkan tanggal dan nama pelanggan yang sama
         df['tanggal_nama_pelanggan'] = df['tanggal'].astype(str) +'-'+ df['nama_pelanggan']
+
+        # Mengubah data menjadi tabulasi
         tabular = pd.crosstab(df['tanggal_nama_pelanggan'],df['nama'])
 
         # Encoding data
@@ -286,6 +302,7 @@ elif menu == 'Data Mining':
         # Menampilkan hasil dari algoritma Apriori
         if st.button("PROSES"):
                 st.success('HASIL PERHITUNGAN APRIORI')
+
                 # Mengubah data menjadi binominal
                 tabular_encode = tabular.applymap(hot_encode)
 
@@ -295,12 +312,12 @@ elif menu == 'Data Mining':
                 # Mengumpulkan aturan dalam dataframe
                 rules = association_rules(frq_items, metric="confidence",min_threshold=minimum_confidence)
                 rules = rules.sort_values(['confidence','lift'], ascending=[False, False])
+
                 # Mengubah nilai support, confidence, dan lift menjadi persentase
                 rules[["antecedent support","consequent support","support","confidence"]] = rules[["antecedent support","consequent support","support","confidence"]].applymap(lambda x: "{:.2f}%".format(x*100))
 
                 # Menampilkan hasil algoritma apriori dalam bentuk dataframe
                 st.dataframe(rules.applymap(lambda x: ','.join(x) if type(x) == frozenset else x))
-                st.dataframe(tabular)
 
     elif sub_menu == 'Forecasting':
         st.header('Forecasting')
