@@ -236,7 +236,6 @@ elif menu == 'Riwayat Transaksi':
     with col1:
         st.dataframe(df, width=2000, height=250)
 
-
     with col2:
         # Buat grafik jumlah penjualan per bulan
         tanggal_mulai = st.date_input('Tanggal Mulai')
