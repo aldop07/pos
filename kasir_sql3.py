@@ -179,53 +179,53 @@ elif menu == 'Laba':
         tanggal_awal = st.date_input('Tanggal Awal')
     with col2:
         tanggal_akhir = st.date_input('Tanggal Akhir')
-    with col1:
-        if st.button('CEK LABA'):
-            
-            # Hitung total pengeluaran
-            query = 'SELECT SUM(jumlah_pengeluaran) FROM pengeluaran WHERE tanggal BETWEEN ? AND ?'
-            cursor = cnx.cursor()
-            cursor.execute(query, (tanggal_awal, tanggal_akhir))
-            result = cursor.fetchone()
-            total_pengeluaran = result[0]
-            total_pengeluaran_rupiah = 'Rp. {:,}'.format(total_pengeluaran).replace(',', '.')
-            st.write('Total Pengeluaran:', total_pengeluaran_rupiah)
+    if st.button('CEK LABA'):
+        
+        # Hitung total pengeluaran
+        query = 'SELECT SUM(jumlah_pengeluaran) FROM pengeluaran WHERE tanggal BETWEEN ? AND ?'
+        cursor = cnx.cursor()
+        cursor.execute(query, (tanggal_awal, tanggal_akhir))
+        result = cursor.fetchone()
+        total_pengeluaran = result[0]
+        total_pengeluaran_rupiah = 'Rp. {:,}'.format(total_pengeluaran).replace(',', '.')
+        st.write('Total Pengeluaran:', total_pengeluaran_rupiah)
 
-            # Hitung total transaksi
-            query = 'SELECT SUM(total) FROM transaksi WHERE tanggal BETWEEN ? AND ?'
-            cursor = cnx.cursor()
-            cursor.execute(query, (tanggal_awal, tanggal_akhir))
-            result = cursor.fetchone()
-            total_transaksi = result[0]
-            total_transaksi_rupiah = 'Rp. {:,}'.format(total_transaksi).replace(',', '.')
-            st.write('Total transaksi:', total_transaksi_rupiah)
-            
-            # Hitung pemasukan
-            query = 'SELECT SUM(total - harga_pokok * jumlah) FROM transaksi JOIN produk ON transaksi.nama = produk.nama WHERE transaksi.tanggal BETWEEN ? AND ?'
-            cursor.execute(query, (tanggal_awal, tanggal_akhir))
-            result = cursor.fetchone()
-            pemasukan = result[0]
-            pemasukan_rupiah = 'Rp. {:,}'.format(pemasukan).replace(',', '.')
-            st.write('Keuntungan:', pemasukan_rupiah)
-            
-            # Hitung laba
-            laba = pemasukan - total_pengeluaran
-            laba_rupiah = 'Rp. {:,}'.format(laba).replace(',', '.')
-            st.write('Laba Bersih:', laba_rupiah)
+        # Hitung total transaksi
+        query = 'SELECT SUM(total) FROM transaksi WHERE tanggal BETWEEN ? AND ?'
+        cursor = cnx.cursor()
+        cursor.execute(query, (tanggal_awal, tanggal_akhir))
+        result = cursor.fetchone()
+        total_transaksi = result[0]
+        total_transaksi_rupiah = 'Rp. {:,}'.format(total_transaksi).replace(',', '.')
+        st.write('Total transaksi:', total_transaksi_rupiah)
+        
+        # Hitung pemasukan
+        query = 'SELECT SUM(total - harga_pokok * jumlah) FROM transaksi JOIN produk ON transaksi.nama = produk.nama WHERE transaksi.tanggal BETWEEN ? AND ?'
+        cursor.execute(query, (tanggal_awal, tanggal_akhir))
+        result = cursor.fetchone()
+        pemasukan = result[0]
+        pemasukan_rupiah = 'Rp. {:,}'.format(pemasukan).replace(',', '.')
+        st.write('Keuntungan:', pemasukan_rupiah)
+        
+        # Hitung laba
+        laba = pemasukan - total_pengeluaran
+        laba_rupiah = 'Rp. {:,}'.format(laba).replace(',', '.')
+        st.write('Laba Bersih:', laba_rupiah)
 
-            # Hitung modal total saat ini
-            query = 'SELECT SUM(harga_pokok * stok) FROM produk'
-            cursor.execute(query)
-            result = cursor.fetchone()
-            modal_now = result[0]
-            modal_now = 'Rp. {:,}'.format(modal_now).replace(',', '.')
-            st.write('Seluruh Modal Saat Ini:', modal_now)
-        else:
-            st.info('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN DAN PEMASUKAN')
+        # Hitung modal total saat ini
+        query = 'SELECT SUM(harga_pokok * stok) FROM produk'
+        cursor.execute(query)
+        result = cursor.fetchone()
+        modal_now = result[0]
+        modal_now = 'Rp. {:,}'.format(modal_now).replace(',', '.')
+        st.write('Seluruh Modal Saat Ini:', modal_now)
+    else:
+        st.info('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN DAN PEMASUKAN')
 
 # Tampilan menu Riwayat Transaksi
 elif menu == 'Riwayat Transaksi':
     st.header('Riwayat Transaksi')
+    col1, col2 = st.columns(2)
     query = 'SELECT tanggal, nama, jumlah, harga, total FROM transaksi'
     df = pd.read_sql(query, cnx)
     df = df.sort_values(by='tanggal', ascending=False)
@@ -233,12 +233,14 @@ elif menu == 'Riwayat Transaksi':
     # Tampilkan harga dan total dalam bentuk angka dengan tanda titik sebagai pemisah ribuan
     df['harga'] = df['harga'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
     df['total'] = df['total'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
-    st.dataframe(df)
+    with col1:
+        st.dataframe(df, width=2000, height=250)
 
 
-    # Buat grafik jumlah penjualan per bulan
-    tanggal_mulai = st.date_input('Tanggal Mulai')
-    tanggal_akhir = st.date_input('Tanggal Akhir')
+    with col2:
+        # Buat grafik jumlah penjualan per bulan
+        tanggal_mulai = st.date_input('Tanggal Mulai')
+        tanggal_akhir = st.date_input('Tanggal Akhir')
     if st.button('CEK GRAFIK'):
 
         # Grafik seluruh penjualan
@@ -262,7 +264,7 @@ elif menu == 'Data Mining':
     sub_menu = st.selectbox('', ['Market Basket Analisys', 'Forecasting'])
     if sub_menu == 'Market Basket Analisys':
         st.header('Market Basket Analisys')
-
+        col1, col2 = st.columns(2)
         # Ambil data produk dari database MySQL
         query = 'SELECT * FROM produk'
         df = pd.read_sql(query, cnx)
@@ -274,12 +276,16 @@ elif menu == 'Data Mining':
         all = st.checkbox('Pilih hanya berdasarkan tanggal')
 
         # Input tanggal awal dan akhir
-        tanggal_mulai = st.date_input("Tanggal Mulai")
-        tanggal_akhir = st.date_input("Tanggal Akhir")
+        with col1:
+            tanggal_mulai = st.date_input("Tanggal Mulai")
+        with col2:
+            tanggal_akhir = st.date_input("Tanggal Akhir")
 
         # Mendefinisikan nilai minimum support dan minimum confidence
-        minimum_support = st.number_input("Nilai minimum support:",0.01)
-        minimum_confidence = st.number_input("Nilai minimum confidence:",0.01)
+        with col1:
+            minimum_support = st.number_input("Nilai minimum support:",0.01)
+        with col2:
+            minimum_confidence = st.number_input("Nilai minimum confidence:",0.01)
         
         # Membaca data transaksi dari database SQLite
         query = 'SELECT tanggal, nama_pelanggan, nama FROM transaksi WHERE tanggal BETWEEN ? AND ?'
@@ -333,10 +339,10 @@ elif menu == 'Data Mining':
     elif sub_menu == 'Forecasting':
         st.header('Forecasting')
         st.info('BELUM FIX')
-        average = st.number_input('Masukan Jumlah Rentang',min_value=1)
         query = "SELECT nama FROM produk"
         df = pd.read_sql(query, cnx)
         nama_item = st.selectbox("Pilih produk ", df['nama'].tolist())
+        average = st.number_input('Masukan Jumlah Rentang',min_value=1) 
         if st.button('CEK FORECASTING'):
             query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = ?"
             df = pd.read_sql(query, cnx,params=(nama_item,))
