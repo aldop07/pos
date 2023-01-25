@@ -216,12 +216,14 @@ elif menu == 'Riwayat Transaksi':
     tanggal_mulai = st.date_input('Tanggal Mulai')
     tanggal_akhir = st.date_input('Tanggal Akhir')
     if st.button('CEK GRAFIK'):
+        # Grafik seluruh penjualan
         query = "SELECT date(tanggal) as tanggal, SUM(jumlah) as jumlah_penjualan FROM transaksi WHERE tanggal BETWEEN ? AND ? GROUP BY date(tanggal)"
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
         fig = px.bar(df, x='tanggal', y='jumlah_penjualan')
         fig.update_layout(autosize=True)
         st.plotly_chart(fig)
-        st.warning('Input dengan teliti')
+        
+        # Grafik penjualan berdasarkan produk
         query = "SELECT nama, tanggal, SUM(jumlah) as jumlah_penjualan FROM transaksi WHERE tanggal BETWEEN ? AND ? GROUP BY nama, date(tanggal)"
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
         df = df.pivot(index='tanggal', columns='nama', values='jumlah_penjualan').fillna(0)
