@@ -52,9 +52,9 @@ if menu == 'Dokumentasi':
 
 elif menu == 'Daftar Produk':
     st.header('Daftar Produk')
-    query = 'SELECT nama, harga, stok FROM produk'
+    query = 'SELECT id, nama, harga, stok FROM produk'
     df = pd.read_sql(query, cnx)
-
+    
     # Tampilkan harga dalam bentuk angka dengan tanda titik sebagai pemisah ribuan
     df['harga'] = df['harga'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
 
@@ -63,18 +63,18 @@ elif menu == 'Daftar Produk':
     col1, col2 = st.columns(2)
     # Tampilkan stok dalam bentuk dataframe
     with col1:
-        st.dataframe(df, width=1500, height=250)
+        st.dataframe(df,width=1500, height=250)
 
     # Tampilkan menu edit produk apabila di centang
     edit = st.checkbox('Edit Produk')
     if edit :
-        produk = st.selectbox("Pilih Produk", df['nama'].tolist())
-        query = 'SELECT harga_pokok, nama, harga, stok FROM produk'
+        query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
         df = pd.read_sql(query, cnx)
-        nama = st.text_input("Nama Baru",value=df.loc[df['nama'] == produk, 'nama'].values[0])
-        harga_pokok = st.number_input("Harga Pokok Baru",value=df.loc[df['nama'] == produk, 'harga_pokok'].values[0])
-        harga = st.number_input("Harga Baru",value=df.loc[df['nama'] == produk, 'harga'].values[0])
-        stok = st.number_input("Stok Baru",value=df.loc[df['nama'] == produk, 'stok'].values[0])
+        produk = st.selectbox("Pilih Produk", df['id'].tolist())
+        nama = st.text_input("Nama Baru",value=df.loc[df['id'] == produk, 'nama'].values[0])
+        harga_pokok = st.number_input("Harga Pokok Baru",value=df.loc[df['id'] == produk, 'harga_pokok'].values[0])
+        harga = st.number_input("Harga Baru",value=df.loc[df['id'] == produk, 'harga'].values[0])
+        stok = st.number_input("Stok Baru",value=df.loc[df['id'] == produk, 'stok'].values[0])
 
         if st.button("Edit"):
             if nama == "" or harga_pokok == 0 or harga == 0 or stok == 0:
@@ -197,6 +197,36 @@ elif menu == 'Tambah Pengeluaran':
             cursor.execute(query, (tanggal, ket_pengeluaran, jumlah_pengeluaran))
             cnx.commit()
             st.success('Pengeluaran berhasil disimpan')
+    col1, col2= st.columns(2)
+    with col1:
+        if st.checkbox('Cek Daftar Pengeluaran'):
+            query = 'SELECT id, nama_pengeluaran, jumlah_pengeluaran, tanggal FROM pengeluaran'
+            df = pd.read_sql(query, cnx)
+            st.dataframe(df)
+    with col2:
+        edit = st.checkbox('Edit Pengeluaran')
+
+        if edit:
+            query = 'SELECT id, nama_pengeluaran, jumlah_pengeluaran, tanggal FROM pengeluaran'
+            df = pd.read_sql(query, cnx)
+            keterangan_lama = st.selectbox('Pilih Pengeluaran', df['id'].tolist())
+            keterangan_baru = st.text_input("Keterangan Baru",value=df.loc[df['id'] == keterangan_lama, 'nama_pengeluaran'].values[0])
+            nominal_baru = st.number_input("Nominal Baru",value=df.loc[df['id'] == keterangan_lama, 'jumlah_pengeluaran'].values[0])
+            tanggal_baru = st.date_input("Tanggal Baru", value=pd.to_datetime(df.loc[df['id'] == keterangan_lama, 'tanggal'].values[0]).date())
+            
+            if st.button("Edit"):
+                if keterangan_baru == "" or nominal_baru == 0 or tanggal_baru == 0:
+                    st.error('Data tidak berhasil diubah')
+                else:
+                    cursor = cnx.cursor()
+                    query = "UPDATE pengeluaran SET id = ?, jumlah_pengeluaran = ?, tanggal = ? WHERE nama_pengeluaran = ?"
+                    cursor.execute(query, (keterangan_baru, nominal_baru, tanggal_baru, keterangan_lama))
+                    cnx.commit()
+                    
+                    st.success("Data berhasil diubah")
+
+        
+
         
 # Tampilan menu Laba
 elif menu == 'Laba':
@@ -206,6 +236,7 @@ elif menu == 'Laba':
         tanggal_awal = st.date_input('Tanggal Awal')
     with col2:
         tanggal_akhir = st.date_input('Tanggal Akhir')
+
     if st.button('CEK LABA'):
 
             # Hitung total pengeluaran
@@ -359,7 +390,7 @@ elif menu == 'Data Mining':
         # Menampilkan hasil dari algoritma Apriori
         if st.button("PROSES"):
 
-            if df.empty:
+            if df.empty is None:
                 st.error('TIDAK DAPAT MELAKUKAN PERHITUNGAN')
             else:
                 st.success('HASIL PERHITUNGAN APRIORI')
