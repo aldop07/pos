@@ -106,7 +106,7 @@ elif menu == 'Daftar Produk':
                 query_update = 'UPDATE produk SET stok = ? WHERE nama = ?'
                 cursor.execute(query_update, (stok_baru, produk))
                 cnx.commit()
-                st.success('Stok produk berhasil diubah')
+                st.success('Stok produk berhasil diupdate')
 
 # Tampilan menu Tambah Produk
 elif menu == 'Tambah Produk':
@@ -119,8 +119,8 @@ elif menu == 'Tambah Produk':
         harga_pokok = st.number_input('Harga Pokok',0)
         stok_produk = st.number_input('Stok Produk',0)
     if st.button('Simpan'):
-        if nama_produk == "" or harga_pokok < 1000 or harga_produk < 1000 :
-            st.warning('Input dengan benar')
+        if nama_produk == "" or harga_pokok < 1000 or harga_produk < 1000 or stok_produk == 0 :
+            st.warning('Produk tidak berhasil disimpan')
         else:
             cursor = cnx.cursor()
             query = 'INSERT INTO produk (nama, harga, stok, harga_pokok) VALUES (?, ?, ?, ?)'
@@ -207,47 +207,61 @@ elif menu == 'Laba':
     with col2:
         tanggal_akhir = st.date_input('Tanggal Akhir')
     if st.button('CEK LABA'):
-        
-        # Hitung total pengeluaran
-        query = 'SELECT SUM(jumlah_pengeluaran) FROM pengeluaran WHERE tanggal BETWEEN ? AND ?'
-        cursor = cnx.cursor()
-        cursor.execute(query, (tanggal_awal, tanggal_akhir))
-        result = cursor.fetchone()
-        total_pengeluaran = result[0]
-        total_pengeluaran_rupiah = 'Rp. {:,}'.format(total_pengeluaran).replace(',', '.')
-        st.write('Total Pengeluaran:', total_pengeluaran_rupiah)
 
-        # Hitung total transaksi
-        query = 'SELECT SUM(total) FROM transaksi WHERE tanggal BETWEEN ? AND ?'
-        cursor = cnx.cursor()
-        cursor.execute(query, (tanggal_awal, tanggal_akhir))
-        result = cursor.fetchone()
-        total_transaksi = result[0]
-        total_transaksi_rupiah = 'Rp. {:,}'.format(total_transaksi).replace(',', '.')
-        st.write('Total transaksi:', total_transaksi_rupiah)
-        
-        # Hitung pemasukan
-        query = 'SELECT SUM(total - harga_pokok * jumlah) FROM transaksi JOIN produk ON transaksi.nama = produk.nama WHERE transaksi.tanggal BETWEEN ? AND ?'
-        cursor.execute(query, (tanggal_awal, tanggal_akhir))
-        result = cursor.fetchone()
-        pemasukan = result[0]
-        pemasukan_rupiah = 'Rp. {:,}'.format(pemasukan).replace(',', '.')
-        st.write('Keuntungan:', pemasukan_rupiah)
-        
-        # Hitung laba
-        laba = pemasukan - total_pengeluaran
-        laba_rupiah = 'Rp. {:,}'.format(laba).replace(',', '.')
-        st.write('Laba Bersih:', laba_rupiah)
+            # Hitung total pengeluaran
+            query = 'SELECT SUM(jumlah_pengeluaran) FROM pengeluaran WHERE tanggal BETWEEN ? AND ?'
+            cursor = cnx.cursor()
+            cursor.execute(query, (tanggal_awal, tanggal_akhir))
+            result = cursor.fetchone()
+            total_pengeluaran = result[0]
+            if total_pengeluaran is None:
+                total_pengeluaran = 0
+            total_pengeluaran_rupiah = 'Rp. {:,}'.format(total_pengeluaran).replace(',', '.')
+            
 
-        # Hitung modal total saat ini
-        query = 'SELECT SUM(harga_pokok * stok) FROM produk'
-        cursor.execute(query)
-        result = cursor.fetchone()
-        modal_now = result[0]
-        modal_now = 'Rp. {:,}'.format(modal_now).replace(',', '.')
-        st.write('Seluruh Modal Saat Ini:', modal_now)
-    else:
-        st.info('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN DAN PEMASUKAN')
+            # Hitung total transaksi
+            query = 'SELECT SUM(total) FROM transaksi WHERE tanggal BETWEEN ? AND ?'
+            cursor = cnx.cursor()
+            cursor.execute(query, (tanggal_awal, tanggal_akhir))
+            result = cursor.fetchone()
+            total_transaksi = result[0]
+            if total_transaksi is None:
+                total_transaksi = 0
+            total_transaksi_rupiah = 'Rp. {:,}'.format(total_transaksi).replace(',', '.')
+            
+            
+            # Hitung pemasukan
+            query = 'SELECT SUM(total - harga_pokok * jumlah) FROM transaksi JOIN produk ON transaksi.nama = produk.nama WHERE transaksi.tanggal BETWEEN ? AND ?'
+            cursor.execute(query, (tanggal_awal, tanggal_akhir))
+            result = cursor.fetchone()
+            pemasukan = result[0]
+            if pemasukan is None:
+                pemasukan = 0
+            pemasukan_rupiah = 'Rp. {:,}'.format(pemasukan).replace(',', '.')
+            
+            
+            # Hitung laba
+            laba = pemasukan - total_pengeluaran
+            laba_rupiah = 'Rp. {:,}'.format(laba).replace(',', '.')
+            
+
+            # Hitung modal total saat ini
+            query = 'SELECT SUM(harga_pokok * stok) FROM produk'
+            cursor.execute(query)
+            result = cursor.fetchone()
+            modal_now = result[0]
+            if modal_now is None:
+                modal_now = 0
+            modal_now = 'Rp. {:,}'.format(modal_now).replace(',', '.')
+            
+            if total_pengeluaran == 0 or total_transaksi == 0 or pemasukan == 0 or laba == 0 or modal_now == 0:
+                st.error('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN DAN PEMASUKAN')
+            else:
+                st.write('Total Pengeluaran:', total_pengeluaran_rupiah)
+                st.write('Total transaksi:', total_transaksi_rupiah)
+                st.write('Keuntungan:', pemasukan_rupiah)
+                st.write('Laba Bersih:', laba_rupiah)
+                st.write('Seluruh Modal Saat Ini:', modal_now)
 
 # Tampilan menu Riwayat Transaksi
 elif menu == 'Riwayat Transaksi':
@@ -344,6 +358,10 @@ elif menu == 'Data Mining':
 
         # Menampilkan hasil dari algoritma Apriori
         if st.button("PROSES"):
+
+            if df.empty:
+                st.error('TIDAK DAPAT MELAKUKAN PERHITUNGAN')
+            else:
                 st.success('HASIL PERHITUNGAN APRIORI')
 
                 # Mengubah data menjadi binominal
