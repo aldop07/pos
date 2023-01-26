@@ -9,7 +9,7 @@ from mlxtend.frequent_patterns import apriori, association_rules
 #   IRFAN NOVALDO HUANG
 
 # Koneksi ke database SQLite
-cnx = sqlite3.connect('kasir.db')
+cnx = sqlite3.connect('kasir_kalimantan.db')
 
 # Buat titit
 icon = 'https://th.bing.com/th/id/R.a406cbfb23b4d4937c5c3e323a7cb567?rik=4qO3lF%2ftE0LZTg&riu=http%3a%2f%2f1.bp.blogspot.com%2f-I-do3iLl5rs%2fUsuaG8IcjhI%2fAAAAAAAAAIE%2fXmXj-zTkS9U%2fs1600%2fUnsera.png&ehk=7Q%2f63voOpFTnTFwucAoLvddSl03O7NITAf9NPD3Ge7M%3d&risl=&pid=ImgRaw&r=0'
