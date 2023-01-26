@@ -189,7 +189,7 @@ elif menu == 'Tambah Pengeluaran':
     ket_pengeluaran = st.text_input('Keterangan Pengeluaran')
     jumlah_pengeluaran = st.number_input('Jumlah Pengeluaran',0)
     if st.button('Simpan'):
-        if ket_pengeluaran == "" and jumlah_pengeluaran == 0:
+        if ket_pengeluaran == "" or jumlah_pengeluaran == 0:
             st.warning("Sebutkan Keterangan Pengeluaran")
         else:
             cursor = cnx.cursor()
