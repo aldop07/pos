@@ -168,6 +168,9 @@ elif menu == 'Tambah Transaksi':
                         # Tambahkan transaksi baru ke tabel transaksi
                         query = 'INSERT INTO transaksi (tanggal, nama_pelanggan, nama, jumlah, harga, total) VALUES (?, ?, ?, ?, ?, ?)'
                         cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, total_harga))
+                        # Kurangi stok produk yang dibeli
+                        query = 'UPDATE produk SET stok = stok - ? WHERE nama = ?'
+                        cursor.execute(query, (jumlah_produk[i], nama_produk[i]))
                     else:
                         transaksi_berhasil = False
                         produk_stok_tidak_mencukupi.append(nama_produk[i])
