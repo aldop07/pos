@@ -141,7 +141,7 @@ elif menu == 'Daftar Produk':
                 harga_pokok = result[0]
                 harga_jual = result[1]
 
-                query = "SELECT SUM(id) FROM update_produk"
+                query = "SELECT MAX(id) FROM update_produk"
                 cursor.execute(query)
                 last_id = cursor.fetchone()[0]
                 if last_id is None:
@@ -161,7 +161,7 @@ elif menu == 'Tambah Produk':
     col1, col2 = st.columns(2)
     with col1:
         cursor = cnx.cursor()
-        query = "SELECT SUM(id) FROM produk"
+        query = "SELECT MAX(id) FROM produk"
         cursor.execute(query)
         last_id = cursor.fetchone()[0]
         if last_id is None:
@@ -200,7 +200,7 @@ elif menu == 'Tambah Transaksi':
     # Buat list nama produk untuk dipilih dalam form input transaksi
     with col1:
         cursor = cnx.cursor()
-        query = "SELECT SUM(id) FROM transaksi"
+        query = "SELECT MAX(id) FROM transaksi"
         cursor.execute(query)
         last_id = cursor.fetchone()[0]
         if last_id is None:
@@ -260,7 +260,7 @@ elif menu == 'Tambah Transaksi':
 elif menu == 'Tambah Pengeluaran':
     st.header('Tambah Pengeluaran')
     cursor = cnx.cursor()
-    query = "SELECT SUM(id) FROM pengeluaran"
+    query = "SELECT MAX(id) FROM pengeluaran"
     cursor.execute(query)
     last_id = cursor.fetchone()[0]
     if last_id is None:
