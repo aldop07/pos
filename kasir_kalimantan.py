@@ -205,6 +205,7 @@ elif menu == 'Tambah Pengeluaran':
         if st.checkbox('Cek Daftar Pengeluaran'):
             query = 'SELECT id, nama_pengeluaran, jumlah_pengeluaran, tanggal FROM pengeluaran'
             df = pd.read_sql(query, cnx)
+            df['jumlah_pengeluaran'] = df['jumlah_pengeluaran'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
             st.dataframe(df)
     with col2:
         edit = st.checkbox('Edit Pengeluaran')
