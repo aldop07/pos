@@ -118,7 +118,7 @@ elif menu == 'Daftar Produk':
         # Tambahkan form input untuk mengubah stok produk
         query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
         df = pd.read_sql(query, cnx)
-        tanggal = st.date_input()
+        tanggal = st.date_input('Tanggal')
         produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
         stok_produk_lama = st.number_input('Stok Produk',0)
         if st.button('Update'):
