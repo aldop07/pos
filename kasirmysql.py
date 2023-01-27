@@ -108,7 +108,7 @@ elif menu == 'Daftar Produk':
         nama = st.text_input("Nama Produk",value=df.loc[df['id'] == id_produk, 'nama'].values[0])
         tombol_hapus = st.button("Hapus")
         if tombol_hapus:
-            query = 'DELETE FROM produk WHERE id = ?'
+            query = 'DELETE FROM produk WHERE id = %s'
             cursor = cnx.cursor()
             cursor.execute(query, (id_produk,))
             cnx.commit()
