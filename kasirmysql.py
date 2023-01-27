@@ -211,8 +211,8 @@ elif menu == 'Tambah Transaksi':
                     cursor.execute(query, (nama_produk[i],))
                     result = cursor.fetchone()
                     harga_produk = result[0]
-                    harga_pokok = result[0]
-                    stok_produk = result[1]
+                    harga_pokok = result[1]
+                    stok_produk = result[2]
                     total_harga = harga_produk * jumlah_produk[i]
                     if stok_produk >= jumlah_produk[i]:
                         # Tambahkan transaksi baru ke tabel transaksi
