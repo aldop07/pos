@@ -149,7 +149,7 @@ elif menu == 'Daftar Produk':
                 else:
                     id = last_id + 1
 
-                query = 'INSERT INTO update_produk (id, tanggal, nama_produk, harga_jual, jumlah_update, jumlah_lama, harga_pokok) VALUES (%s, %s, %s, %s, %s)'
+                query = 'INSERT INTO update_produk (id, tanggal, nama_produk, harga_jual, jumlah_update, jumlah_lama, harga_pokok) VALUES (%s, %s, %s, %s, %s, %s, %s)'
                 cursor.execute(query, (id, tanggal, produk, harga_jual, stok_produk_baru, stok_lama,harga_pokok))
                 cnx.commit()
 
