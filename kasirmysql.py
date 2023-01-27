@@ -128,7 +128,7 @@ elif menu == 'Daftar Produk':
                 result = cursor.fetchone()
                 stok_lama = result[0]
                 stok_baru = stok_lama + stok_produk_lama
-                query_update = 'UPDATE produk SET stok = ? WHERE nama = ?'
+                query_update = 'UPDATE produk SET stok = %s WHERE nama = %s'
                 cursor.execute(query_update, (stok_baru, produk))
                 cnx.commit()
                 st.success('Stok produk berhasil diupdate')
