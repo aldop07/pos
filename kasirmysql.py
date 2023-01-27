@@ -336,7 +336,7 @@ elif menu == 'Laba':
             
             
             # Hitung pemasukan
-            query = 'SELECT SUM(total - harga_pokok * jumlah) FROM transaksi JOIN produk ON transaksi.nama = produk.nama WHERE transaksi.tanggal BETWEEN %s AND %s'
+            query = 'SELECT SUM(total - harga_pokok * jumlah) FROM transaksi  WHERE tanggal BETWEEN %s AND %s'
             cursor.execute(query, (tanggal_awal, tanggal_akhir))
             result = cursor.fetchone()
             pemasukan = result[0]
