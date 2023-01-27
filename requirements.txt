@@ -5,3 +5,4 @@ plotly
 pip
 matplotlib
 numpy
+mysql-connector
