@@ -92,7 +92,7 @@ elif menu == 'Daftar Produk':
             else:
                 # Query untuk mengubah data di tabel produk
                 cursor = cnx.cursor()
-                query = "UPDATE produk SET harga_pokok = ?, nama = ?, harga = ?, stok = ? WHERE id = ?"
+                query = "UPDATE produk SET harga_pokok = %s, nama = %s, harga = %s, stok = %s WHERE id = %s"
                 cursor.execute(query, (harga_pokok, nama, harga, stok, produk))
                 cnx.commit()
             
