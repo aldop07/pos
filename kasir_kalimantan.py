@@ -98,7 +98,7 @@ elif menu == 'Daftar Produk':
         query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
         df = pd.read_sql(query, cnx)
         id_produk = st.selectbox("Pilih ID Produk", df['id'].tolist())
-        nama = st.text_input("Nama Baru",value=df.loc[df['id'] == id_produk, 'nama'].values[0])
+        nama = st.text_input("Nama Produk",value=df.loc[df['id'] == id_produk, 'nama'].values[0])
         tombol_hapus = st.button("Hapus")
         if tombol_hapus:
             query = 'DELETE FROM produk WHERE id = ?'
