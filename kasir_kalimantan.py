@@ -223,7 +223,7 @@ elif menu == 'Tambah Pengeluaran':
                     st.error('Data tidak berhasil diubah')
                 else:
                     cursor = cnx.cursor()
-                    query = "UPDATE pengeluaran SET id = ?, jumlah_pengeluaran = ?, tanggal = ? WHERE nama_pengeluaran = ?"
+                    query = "UPDATE pengeluaran SET nama_pengeluaran = ?, jumlah_pengeluaran = ?, tanggal = ? WHERE id = ?"
                     cursor.execute(query, (keterangan_baru, nominal_baru, tanggal_baru, keterangan_lama))
                     cnx.commit()
                     
