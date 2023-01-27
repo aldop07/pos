@@ -20,7 +20,7 @@ cnx = mysql.connector.connect(
 
 # Buat titit
 icon = 'https://e7.pngegg.com/pngimages/263/96/png-clipart-hijab-islam-islamic-background-brown-food-thumbnail.png'
-st.set_page_config(page_title="Point Of Sale", page_icon=icon, , layout="wide")
+st.set_page_config(page_title="Point Of Sale", page_icon=icon, initial_sidebar_state="auto")
 
 st.title('Aplikasi Point Of Sale')
 # Buat sidebar dan menu dropdown
