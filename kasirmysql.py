@@ -207,16 +207,17 @@ elif menu == 'Tambah Transaksi':
                 transaksi_berhasil = True
                 produk_stok_tidak_mencukupi = []
                 for i in range(len(nama_produk)):
-                    query = 'SELECT harga, stok FROM produk WHERE nama = %s;'
+                    query = 'SELECT harga, harga_pokok, stok FROM produk WHERE nama = %s;'
                     cursor.execute(query, (nama_produk[i],))
                     result = cursor.fetchone()
                     harga_produk = result[0]
+                    harga_pokok = result[0]
                     stok_produk = result[1]
                     total_harga = harga_produk * jumlah_produk[i]
                     if stok_produk >= jumlah_produk[i]:
                         # Tambahkan transaksi baru ke tabel transaksi
-                        query = 'INSERT INTO transaksi (id, tanggal, nama_pelanggan, nama, jumlah, harga, total) VALUES (%s, %s, %s, %s, %s, %s, %s)'
-                        cursor.execute(query, (id, tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, total_harga))
+                        query = 'INSERT INTO transaksi (tanggal, nama_pelanggan, nama, jumlah, harga, harga_pokok, total) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+                        cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, harga_pokok, total_harga))
                         # Kurangi stok produk yang dibeli
                         query = 'UPDATE produk SET stok = stok - %s WHERE nama = %s;'
                         cursor.execute(query, (jumlah_produk[i], nama_produk[i]))
