@@ -52,7 +52,7 @@ if menu == 'Dokumentasi':
 
 elif menu == 'Daftar Produk':
     st.header('Daftar Produk')
-    query = 'SELECT id, nama, harga, stok FROM produk'
+    query = 'SELECT nama, harga, stok FROM produk'
     df = pd.read_sql(query, cnx)
     
     # Tampilkan harga dalam bentuk angka dengan tanda titik sebagai pemisah ribuan
