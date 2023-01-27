@@ -139,7 +139,7 @@ elif menu == 'Tambah Transaksi':
     search = st.text_input('Cari produk', key='search')
     if search:
         df = df[df['nama'].str.contains(search, case=False, na=False)]
-        st.dataframe(df,width=1500, height=140)
+    st.dataframe(df,width=1500, height=140)
     # Ambil data produk dari database MySQL
     query = 'SELECT * FROM produk'
     df = pd.read_sql(query, cnx)
@@ -185,6 +185,8 @@ elif menu == 'Tambah Transaksi':
 
                 if transaksi_berhasil:
                     cnx.commit()
+                    st.balloons()
+                    st.snow()
                     st.success('Transaksi berhasil disimpan')
                 else:
                     cnx.rollback()
