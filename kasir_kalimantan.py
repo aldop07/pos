@@ -63,7 +63,10 @@ elif menu == 'Daftar Produk':
     col1, col2 = st.columns(2)
     # Tampilkan stok dalam bentuk dataframe
     with col1:
-        st.dataframe(df,width=1500, height=250)
+        search = st.text_input('Cari produk', key='search')
+        if search:
+            df = df[df['nama'].str.contains(search, case=False, na=False)]
+        st.dataframe(df,width=1500, height=140)
 
     # Tampilkan menu edit produk apabila di centang
     edit = st.checkbox('Edit Produk')
