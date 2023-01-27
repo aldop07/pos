@@ -116,6 +116,8 @@ elif menu == 'Daftar Produk':
  
     with col2:
         # Tambahkan form input untuk mengubah stok produk
+        query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
+        df = pd.read_sql(query, cnx)
         produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
         stok_produk_lama = st.number_input('Stok Produk',0)
         if st.button('Update'):
@@ -123,7 +125,7 @@ elif menu == 'Daftar Produk':
                 st.error('produk tidak dapat di update')
             else:
                 cursor = cnx.cursor()
-                query_select = 'SELECT stok FROM produk WHERE nama = ?'
+                query_select = 'SELECT stok FROM produk WHERE nama = %s'
                 cursor.execute(query_select, (produk,))
                 result = cursor.fetchone()
                 stok_lama = result[0]
