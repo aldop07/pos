@@ -146,7 +146,6 @@ elif menu == 'Tambah Produk':
             id = 1
         else:
             id = last_id + 1
-        st.write("ID",id)
         nama_produk = st.text_input('Nama Produk')
         harga_produk = st.number_input('Harga Jual',0)
     with col2:
@@ -186,7 +185,6 @@ elif menu == 'Tambah Transaksi':
             id = 1
         else:
             id = last_id + 1
-        st.write("ID",id)
         tanggal = st.date_input('Tanggal')
         nama_pelanggan = st.text_input ('Nama Pelanggan')
     with col2:
@@ -249,7 +247,6 @@ elif menu == 'Tambah Pengeluaran':
         id = 1
     else:
         id = last_id + 1
-    st.write("ID",id)
     tanggal = st.date_input('Tanggal')
     ket_pengeluaran = st.text_input('Keterangan Pengeluaran')
     jumlah_pengeluaran = st.number_input('Jumlah Pengeluaran',0)
