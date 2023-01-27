@@ -52,7 +52,7 @@ if menu == 'Dokumentasi':
 
 elif menu == 'Daftar Produk':
     st.header('Daftar Produk')
-    query = 'SELECT nama, harga, stok FROM produk'
+    query = 'SELECT id, nama, harga, stok FROM produk'
     df = pd.read_sql(query, cnx)
     
     # Tampilkan harga dalam bentuk angka dengan tanda titik sebagai pemisah ribuan
@@ -149,7 +149,7 @@ elif menu == 'Tambah Produk':
 # Tampilan menu Tambah Transaksi
 elif menu == 'Tambah Transaksi':
     st.header('Tambah Transaksi')
-    query = 'SELECT id, nama, harga, stok FROM produk'
+    query = 'SELECT nama, harga, stok FROM produk'
     df = pd.read_sql(query, cnx)
     search = st.text_input('Cari produk', key='search')
     if search:
