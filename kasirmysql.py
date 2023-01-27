@@ -279,7 +279,7 @@ elif menu == 'Tambah Pengeluaran':
             nama = st.text_input("Keterangan",value=df.loc[df['id'] == id_produk, 'nama_pengeluaran'].values[0])
             tombol_hapus = st.button("Hapus")
             if tombol_hapus:
-                query = 'DELETE FROM pengeluaran WHERE id = ?'
+                query = 'DELETE FROM pengeluaran WHERE id = %s'
                 cursor = cnx.cursor()
                 cursor.execute(query, (id_produk,))
                 cnx.commit()
@@ -394,7 +394,7 @@ elif menu == 'Riwayat Transaksi':
             nama = st.text_input("Nama Pembeli",value=df.loc[df['id'] == id_produk, 'nama_pelanggan'].values[0])
             tombol_hapus = st.button("Hapus")
             if tombol_hapus:
-                query = 'DELETE FROM transaksi WHERE id = ?'
+                query = 'DELETE FROM transaksi WHERE id = %s'
                 cursor = cnx.cursor()
                 cursor.execute(query, (id_produk,))
                 cnx.commit()
