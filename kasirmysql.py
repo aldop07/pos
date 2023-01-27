@@ -19,7 +19,7 @@ cnx = mysql.connector.connect(
 )
 
 # Buat titit
-icon = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fgiphy.com%2Fexplore%2Flogo-lega-serie-a&psig=AOvVaw1_uZQqvkzsKK_yQMbml7Sj&ust=1674898219830000&source=images&cd=vfe&ved=0CA8QjRxqFwoTCLjiyZ245_wCFQAAAAAdAAAAABAX'
+icon = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fid.pngtree.com%2Ffreepng%2Fbeauty-logo-design-template-woman-healthcare_6259387.html&psig=AOvVaw2ow1ipu_Sdmhbb98M-7u8A&ust=1674898352691000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCOiL9Ny45_wCFQAAAAAdAAAAABAE'
 st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
 
 st.title('Aplikasi Point Of Sale')
