@@ -224,11 +224,8 @@ elif menu == 'Tambah Transaksi':
 
                 if transaksi_berhasil:
                     cnx.commit()
-                    with st.spinner('Sedang diproses..'):
-                        time.sleep(3)
-                        st.success('Transaksi berhasil disimpan')
-                        st.balloons()
-                        st.snow()
+                    st.balloons()
+                    st.success('Transaksi berhasil disimpan')
                 else:
                     cnx.rollback()
                     if len(produk_stok_tidak_mencukupi) == 1:
