@@ -95,9 +95,9 @@ elif menu == 'Daftar Produk':
     with col2:
         # Tambahkan form input untuk mengubah stok produk
         produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
-        stok_produk_update = st.number_input('Stok Produk',0)
+        stok_produk_lama = st.number_input('Stok Produk',0)
         if st.button('Update'):
-            if stok_produk_update < 1:
+            if stok_produk_lama < 1:
                 st.error('produk tidak dapat di update')
             else:
                 cursor = cnx.cursor()
@@ -105,7 +105,7 @@ elif menu == 'Daftar Produk':
                 cursor.execute(query_select, (produk,))
                 result = cursor.fetchone()
                 stok_lama = result[0]
-                stok_baru = stok_lama + stok_produk_update
+                stok_baru = stok_lama + stok_produk_lama
                 query_update = 'UPDATE produk SET stok = ? WHERE nama = ?'
                 cursor.execute(query_update, (stok_baru, produk))
                 cnx.commit()
@@ -134,7 +134,12 @@ elif menu == 'Tambah Produk':
 # Tampilan menu Tambah Transaksi
 elif menu == 'Tambah Transaksi':
     st.header('Tambah Transaksi')
-    
+    query = 'SELECT id, nama, harga, stok FROM produk'
+    df = pd.read_sql(query, cnx)
+    search = st.text_input('Cari produk', key='search')
+    if search:
+        df = df[df['nama'].str.contains(search, case=False, na=False)]
+        st.dataframe(df,width=1500, height=140)
     # Ambil data produk dari database MySQL
     query = 'SELECT * FROM produk'
     df = pd.read_sql(query, cnx)
@@ -212,7 +217,6 @@ elif menu == 'Tambah Pengeluaran':
             st.dataframe(df)
     with col2:
         edit = st.checkbox('Edit Pengeluaran')
-
         if edit:
             query = 'SELECT id, nama_pengeluaran, jumlah_pengeluaran, tanggal FROM pengeluaran'
             df = pd.read_sql(query, cnx)
@@ -232,9 +236,6 @@ elif menu == 'Tambah Pengeluaran':
                     
                     st.success("Data berhasil diubah")
 
-        
-
-        
 # Tampilan menu Laba
 elif menu == 'Laba':
     st.header('Laba')
