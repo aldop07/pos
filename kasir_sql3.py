@@ -63,7 +63,10 @@ elif menu == 'Daftar Produk':
     col1, col2 = st.columns(2)
     # Tampilkan stok dalam bentuk dataframe
     with col1:
-        st.dataframe(df,width=1500, height=250)
+        search = st.text_input('Cari produk', key='search')
+        if search:
+            df = df[df['nama'].str.contains(search, case=False, na=False)]
+        st.dataframe(df,width=1500, height=140)
 
     # Tampilkan menu edit produk apabila di centang
     edit = st.checkbox('Edit Produk')
@@ -131,7 +134,12 @@ elif menu == 'Tambah Produk':
 # Tampilan menu Tambah Transaksi
 elif menu == 'Tambah Transaksi':
     st.header('Tambah Transaksi')
-    
+    query = 'SELECT id, nama, harga, stok FROM produk'
+    df = pd.read_sql(query, cnx)
+    search = st.text_input('Cari produk', key='search')
+    if search:
+        df = df[df['nama'].str.contains(search, case=False, na=False)]
+        st.dataframe(df,width=1500, height=140)
     # Ambil data produk dari database MySQL
     query = 'SELECT * FROM produk'
     df = pd.read_sql(query, cnx)
@@ -205,10 +213,10 @@ elif menu == 'Tambah Pengeluaran':
         if st.checkbox('Cek Daftar Pengeluaran'):
             query = 'SELECT id, nama_pengeluaran, jumlah_pengeluaran, tanggal FROM pengeluaran'
             df = pd.read_sql(query, cnx)
+            df['jumlah_pengeluaran'] = df['jumlah_pengeluaran'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
             st.dataframe(df)
     with col2:
         edit = st.checkbox('Edit Pengeluaran')
-
         if edit:
             query = 'SELECT id, nama_pengeluaran, jumlah_pengeluaran, tanggal FROM pengeluaran'
             df = pd.read_sql(query, cnx)
@@ -222,15 +230,12 @@ elif menu == 'Tambah Pengeluaran':
                     st.error('Data tidak berhasil diubah')
                 else:
                     cursor = cnx.cursor()
-                    query = "UPDATE pengeluaran SET id = ?, jumlah_pengeluaran = ?, tanggal = ? WHERE nama_pengeluaran = ?"
+                    query = "UPDATE pengeluaran SET nama_pengeluaran = ?, jumlah_pengeluaran = ?, tanggal = ? WHERE id = ?"
                     cursor.execute(query, (keterangan_baru, nominal_baru, tanggal_baru, keterangan_lama))
                     cnx.commit()
                     
                     st.success("Data berhasil diubah")
 
-        
-
-        
 # Tampilan menu Laba
 elif menu == 'Laba':
     st.header('Laba')
