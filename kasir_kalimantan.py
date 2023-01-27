@@ -187,7 +187,6 @@ elif menu == 'Tambah Transaksi':
                 if transaksi_berhasil:
                     cnx.commit()
                     st.balloons()
-                    st.snow()
                     st.success('Transaksi berhasil disimpan')
                 else:
                     cnx.rollback()
