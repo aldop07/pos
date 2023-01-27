@@ -139,6 +139,7 @@ elif menu == 'Tambah Transaksi':
     search = st.text_input('Cari produk', key='search')
     if search:
         df = df[df['nama'].str.contains(search, case=False, na=False)]
+    df['harga'] = df['harga'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
     st.dataframe(df,width=1500, height=140)
     # Ambil data produk dari database MySQL
     query = 'SELECT * FROM produk'
