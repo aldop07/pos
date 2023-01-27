@@ -73,7 +73,7 @@ elif menu == 'Daftar Produk':
     if edit :
         query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
         df = pd.read_sql(query, cnx)
-        produk = st.selectbox("Pilih Produk", df['id'].tolist())
+        produk = st.selectbox("Id Produk", df['id'].tolist())
         nama = st.text_input("Nama Baru",value=df.loc[df['id'] == produk, 'nama'].values[0])
         harga_pokok = st.number_input("Harga Pokok Baru",value=df.loc[df['id'] == produk, 'harga_pokok'].values[0])
         harga = st.number_input("Harga Baru",value=df.loc[df['id'] == produk, 'harga'].values[0])
@@ -223,7 +223,7 @@ elif menu == 'Tambah Pengeluaran':
         if edit:
             query = 'SELECT id, nama_pengeluaran, jumlah_pengeluaran, tanggal FROM pengeluaran'
             df = pd.read_sql(query, cnx)
-            keterangan_lama = st.selectbox('Pilih Pengeluaran', df['id'].tolist())
+            keterangan_lama = st.selectbox('Id Pengeluaran', df['id'].tolist())
             keterangan_baru = st.text_input("Keterangan Baru",value=df.loc[df['id'] == keterangan_lama, 'nama_pengeluaran'].values[0])
             nominal_baru = st.number_input("Nominal Baru",value=df.loc[df['id'] == keterangan_lama, 'jumlah_pengeluaran'].values[0])
             tanggal_baru = st.date_input("Tanggal Baru", value=pd.to_datetime(df.loc[df['id'] == keterangan_lama, 'tanggal'].values[0]).date())
