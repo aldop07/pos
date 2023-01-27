@@ -19,7 +19,7 @@ cnx = mysql.connector.connect(
 )
 
 # Buat titit
-icon = 'https://cdn.dribbble.com/users/46315/screenshots/1065283/icons-animation.gif'
+icon = 'https://i.pinimg.com/originals/04/41/ea/0441ea5619b979bde781aa040943c208.gif'
 st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
 
 st.title('Aplikasi Point Of Sale')
