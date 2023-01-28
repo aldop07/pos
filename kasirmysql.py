@@ -21,9 +21,6 @@ st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
 def login():
     
     # Input username dan password dari user
-    username = st.sidebar.text_input("Username")
-    password = st.sidebar.text_input("Password", type='password')
-    hak_akses = st.sidebar.selectbox("", ["admin", "user"])
     cursor = cnx.cursor()
     query = "SELECT MAX(id) FROM user"
     cursor.execute(query)
@@ -32,6 +29,9 @@ def login():
        id = 1
     else:
        id = last_id + 1
+    username = st.sidebar.text_input("Username")
+    password = st.sidebar.text_input("Password", type='password')
+    hak_akses = st.sidebar.selectbox("", ["admin", "user"])
     if st.sidebar.checkbox("Login"):
         # Prevent SQL Injection
         cursor = cnx.cursor(prepared=True)
@@ -39,9 +39,10 @@ def login():
         cursor.execute(query, (username, password, hak_akses))
         result = cursor.fetchone()
     if st.sidebar.checkbox('Register'):
-        cursor = cnx.cursor(prepared=True)
-        query = 'INSERT INTO user (id, user, hak_akses, password) VALUES (%s, %s, %s, %s)'
+        cursor = cnx.cursor()
+        query = 'INSERT INTO produk (id, user, hak_akses, password) VALUES (%s, %s, %s, %s)'
         cursor.execute(query, (id, username, hak_akses, password))
+        cnx.commit()
 
         # Cek apakah username, password dan hak_akses cocok dengan data di tabel
         if result:
