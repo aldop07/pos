@@ -46,8 +46,8 @@ with col1:
     if st.button('Login'):
         # Cek data di tabel user
         cursor = cnx.cursor()
-        query = "SELECT * FROM user WHERE user='{username}' AND password='{password}'"
-        cursor.execute(query)
+        query = "SELECT * FROM user WHERE user=%s AND password=%s"
+        cursor.execute(query, (username, password))
         data = cursor.fetchone()
         if data:
             st.success('Login berhasil')
