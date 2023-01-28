@@ -39,7 +39,7 @@ with col2:
             id = 1
         else:
             id = last_id + 1
-        query = 'INSERT INTO produk (id, user, password) VALUES (%s, %s, %s)'
+        query = 'INSERT INTO user (id, user, password) VALUES (%s, %s, %s)'
         cursor.execute(query, (id, username, password))
         cnx.commit() 
 with col1:
