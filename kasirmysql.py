@@ -19,11 +19,19 @@ icon = 'https://e7.pngegg.com/pngimages/263/96/png-clipart-hijab-islam-islamic-b
 st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
 # Fungsi untuk login
 def login():
+    
     # Input username dan password dari user
     username = st.sidebar.text_input("Username")
     password = st.sidebar.text_input("Password", type='password')
     hak_akses = st.sidebar.selectbox("", ["admin", "user"])
-
+    cursor = cnx.cursor()
+    query = "SELECT MAX(id) FROM user"
+    cursor.execute(query)
+    last_id = cursor.fetchone()[0]
+    if last_id is None:
+       id = 1
+    else:
+       id = last_id + 1
     if st.sidebar.checkbox("Login"):
         # Prevent SQL Injection
         cursor = cnx.cursor(prepared=True)
