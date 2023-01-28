@@ -17,7 +17,9 @@ cnx = mysql.connector.connect(
     host='sql12.freesqldatabase.com',
     database='sql12593622'
 )
-
+# Variabel untuk menyimpan status login
+is_logged_in = False
+akses = None
 
 # Buat titit
 icon = 'https://e7.pngegg.com/pngimages/263/96/png-clipart-hijab-islam-islamic-background-brown-food-thumbnail.png'
@@ -39,7 +41,7 @@ with col2:
             id = 1
         else:
             id = last_id + 1
-        query = 'INSERT INTO user (id, user, password) VALUES (%s, %s, %s)'
+        query = 'INSERT INTO produk (id, user, password) VALUES (%s, %s, %s)'
         cursor.execute(query, (id, username, password))
         cnx.commit() 
 with col1:
@@ -51,8 +53,12 @@ with col1:
         data = cursor.fetchone()
         if data:
             st.success('Login berhasil')
+            is_logged_in = True
             # Ambil data hak akses
             akses = data[2]
+
+# Tampilkan menu sesuai dengan status login
+if is_logged_in:
             # Tampilkan menu sesuai hak akses
             if akses == 'admin':
                 st.title('Aplikasi Point Of Sale')
