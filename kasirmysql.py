@@ -17,51 +17,45 @@ cnx = mysql.connector.connect(
     host='sql12.freesqldatabase.com',
     database='sql12593622'
 )
-# Variabel untuk menyimpan status login
-is_logged_in = False
-akses = None
 
 # Buat titit
 icon = 'https://e7.pngegg.com/pngimages/263/96/png-clipart-hijab-islam-islamic-background-brown-food-thumbnail.png'
 st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
 
-if not is_logged_in:
-    # Form Login
-    st.header('Login')
-    username = st.text_input('Username')
-    password = st.text_input('Password', type='password')
-    col1, col2 = st.columns(2)
-    with col2:
-        if st.button('Register'):
-            cursor = cnx.cursor()
-            query = "SELECT MAX(id) FROM user"
-            cursor.execute(query)
-            last_id = cursor.fetchone()[0]
-            if last_id is None:
-                id = 1
-            else:
-                id = last_id + 1
-            query = 'INSERT INTO produk (id, user, password) VALUES (%s, %s, %s)'
-            cursor.execute(query, (id, username, password))
-            cnx.commit() 
-    with col1:
-        if st.button('Login'):
-            # Cek data di tabel user
-            cursor = cnx.cursor()
-            query = "SELECT * FROM user WHERE user=%s AND password=%s"
-            cursor.execute(query, (username, password))
-            data = cursor.fetchone()
-            if data:
-                st.success('Login berhasil')
-                is_logged_in = True
-                # Ambil data hak akses
-                akses = data[2]
 
-# Tampilkan menu sesuai dengan status login
-if is_logged_in:
+st.title('Aplikasi Point Of Sale')
+# Form Login
+st.header('Login')
+username = st.text_input('Username')
+password = st.text_input('Password', type='password')
+col1, col2 = st.columns(2)
+with col2:
+    if st.button('Register'):
+        cursor = cnx.cursor()
+        query = "SELECT MAX(id) FROM user"
+        cursor.execute(query)
+        last_id = cursor.fetchone()[0]
+        if last_id is None:
+            id = 1
+        else:
+            id = last_id + 1
+        query = 'INSERT INTO produk (id, user, password) VALUES (%s, %s, %s)'
+        cursor.execute(query, (id, username, password))
+        cnx.commit() 
+with col1:
+    if st.button('Login'):
+        # Cek data di tabel user
+        cursor = cnx.cursor()
+        query = "SELECT * FROM user WHERE user=%s AND password=%s"
+        cursor.execute(query, (username, password))
+        data = cursor.fetchone()
+        if data:
+            st.success('Login berhasil')
+            st.set_page_config(page_title="", page_icon=None, layout="wide")
+            # Ambil data hak akses
+            akses = data[2]
             # Tampilkan menu sesuai hak akses
             if akses == 'admin':
-                st.title('Aplikasi Point Of Sale')
                 # Buat sidebar dan menu dropdown
                 st.sidebar.header('Menu') 
                 menu = st.sidebar.selectbox('', ['Dokumentasi','Daftar Produk', 'Tambah Produk', 'Tambah Transaksi', 'Tambah Pengeluaran', 'Laba', 'Riwayat Transaksi','Data Mining'])
@@ -573,11 +567,3 @@ if is_logged_in:
                             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
                             df = df.sort_values(by='tanggal', ascending=False)
                             st.dataframe(df)
-            elif akses == 'user':
-                # Tampilkan menu tambah transaksi dan tambah pengeluaran saja
-                st.sidebar.header('Menu') 
-                menu = st.sidebar.selectbox('', ['Tambah Transaksi', 'Tambah Pengeluaran'])
-                if menu == 'Tambah Transaksi':
-                    st.header('Tambah Transaksi')
-                elif menu == 'Tambah Pengeluaran':
-                    st.header('Tambah Pengeluaran')
