@@ -32,18 +32,19 @@ def login():
     username = st.sidebar.text_input("Username")
     password = st.sidebar.text_input("Password", type='password')
     hak_akses = st.sidebar.selectbox("", ["admin", "user"])
+    if st.sidebar.checkbox('Register'):
+        cursor = cnx.cursor()
+        query = 'INSERT INTO user (id, user, hak_akses, password) VALUES (%s, %s, %s, %s)'
+        cursor.execute(query, (id, username, hak_akses, password))
+        cnx.commit()
+
     if st.sidebar.checkbox("Login"):
         # Prevent SQL Injection
         cursor = cnx.cursor(prepared=True)
         query = "SELECT * FROM user WHERE user = %s AND password = %s and hak_akses = %s"
         cursor.execute(query, (username, password, hak_akses))
         result = cursor.fetchone()
-    if st.sidebar.checkbox('Register'):
-        cursor = cnx.cursor()
-        query = 'INSERT INTO produk (id, user, hak_akses, password) VALUES (%s, %s, %s, %s)'
-        cursor.execute(query, (id, username, hak_akses, password))
-        cnx.commit()
-
+ 
         # Cek apakah username, password dan hak_akses cocok dengan data di tabel
         if result:
             if hak_akses == 'admin':
