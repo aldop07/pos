@@ -25,37 +25,37 @@ akses = None
 icon = 'https://e7.pngegg.com/pngimages/263/96/png-clipart-hijab-islam-islamic-background-brown-food-thumbnail.png'
 st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
 
-
-# Form Login
-st.header('Login')
-username = st.text_input('Username')
-password = st.text_input('Password', type='password')
-col1, col2 = st.columns(2)
-with col2:
-    if st.button('Register'):
-        cursor = cnx.cursor()
-        query = "SELECT MAX(id) FROM user"
-        cursor.execute(query)
-        last_id = cursor.fetchone()[0]
-        if last_id is None:
-            id = 1
-        else:
-            id = last_id + 1
-        query = 'INSERT INTO produk (id, user, password) VALUES (%s, %s, %s)'
-        cursor.execute(query, (id, username, password))
-        cnx.commit() 
-with col1:
-    if st.button('Login'):
-        # Cek data di tabel user
-        cursor = cnx.cursor()
-        query = "SELECT * FROM user WHERE user=%s AND password=%s"
-        cursor.execute(query, (username, password))
-        data = cursor.fetchone()
-        if data:
-            st.success('Login berhasil')
-            is_logged_in = True
-            # Ambil data hak akses
-            akses = data[2]
+if not is_logged_in:
+    # Form Login
+    st.header('Login')
+    username = st.text_input('Username')
+    password = st.text_input('Password', type='password')
+    col1, col2 = st.columns(2)
+    with col2:
+        if st.button('Register'):
+            cursor = cnx.cursor()
+            query = "SELECT MAX(id) FROM user"
+            cursor.execute(query)
+            last_id = cursor.fetchone()[0]
+            if last_id is None:
+                id = 1
+            else:
+                id = last_id + 1
+            query = 'INSERT INTO produk (id, user, password) VALUES (%s, %s, %s)'
+            cursor.execute(query, (id, username, password))
+            cnx.commit() 
+    with col1:
+        if st.button('Login'):
+            # Cek data di tabel user
+            cursor = cnx.cursor()
+            query = "SELECT * FROM user WHERE user=%s AND password=%s"
+            cursor.execute(query, (username, password))
+            data = cursor.fetchone()
+            if data:
+                st.success('Login berhasil')
+                is_logged_in = True
+                # Ambil data hak akses
+                akses = data[2]
 
 # Tampilkan menu sesuai dengan status login
 if is_logged_in:
