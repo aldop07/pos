@@ -32,7 +32,7 @@ def login():
         result = cursor.fetchone()
     if st.sidebar.checkbox('Register'):
         cursor = cnx.cursor()
-        query = 'INSERT INTO USER (id, user, hak_akses, password) VALUES (%s, %s, %s, %s)'
+        query = 'INSERT INTO user (id, user, hak_akses, password) VALUES (%s, %s, %s, %s)'
         cursor.execute(query, (id, username, hak_akses, password))
         cnx.commit()
 
