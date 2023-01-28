@@ -42,7 +42,6 @@ def login():
         cursor = cnx.cursor()
         query = 'INSERT INTO user (id, user, hak_akses, password) VALUES (%s, %s, %s, %s)'
         cursor.execute(query, (id, username, hak_akses, password))
-        cnx.commit()
 
         # Cek apakah username, password dan hak_akses cocok dengan data di tabel
         if result:
