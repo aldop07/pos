@@ -50,7 +50,7 @@ def login():
             if hak_akses == 'admin':
                 # Tampilkan menu sidebar untuk admin
                 menu = st.sidebar.selectbox('', ['Dokumentasi','Daftar Produk', 'Tambah Produk', 'Tambah Transaksi', 'Tambah Pengeluaran', 'Laba', 'Riwayat Transaksi','Data Mining'])
-# Tampilan menu Dokumentasi
+                # Tampilan menu Dokumentasi
                 if menu == 'Dokumentasi':
                     st.header('Dokumentasi')
                     st.info('Baca jurnal berikut terlebih dahulu')
