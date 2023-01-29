@@ -133,8 +133,9 @@ elif menu == 'Daftar Produk':
        if st.button('Edit'):
             cursor = cnx.cursor()
             query = "UPDATE update_produk SET jumlah_update = %s WHERE id = %s"
-            cursor.execute(query, (jumlah,))
+            cursor.execute(query, (jumlah, produk))
             cnx.commit()
+            
        if st.button('Hapus'):
             query = 'DELETE FROM update_produk WHERE id = %s'
             cursor = cnx.cursor()
