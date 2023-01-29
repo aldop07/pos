@@ -302,7 +302,7 @@ elif menu == 'Tambah Pengeluaran':
                 cnx.commit()
                 st.success('Pengeluaran berhasil dihapus')
         
-        edit = st.checkbox('Edit Pengeluaran')
+        edit = st.checkbox('Edit/Hapus Pengeluaran')
         if edit:
             query = 'SELECT id, nama_pengeluaran, jumlah_pengeluaran, tanggal FROM pengeluaran'
             df = pd.read_sql(query, cnx)
@@ -326,7 +326,7 @@ elif menu == 'Tambah Pengeluaran':
             if tombol_hapus:
                 query = 'DELETE FROM pengeluaran WHERE id = %s'
                 cursor = cnx.cursor()
-                cursor.execute(query, (id_produk,))
+                cursor.execute(query, (keterangan_lama,))
                 cnx.commit()
                 st.success('Pengeluaran berhasil dihapus')
 
