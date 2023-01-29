@@ -321,6 +321,14 @@ elif menu == 'Tambah Pengeluaran':
                     cnx.commit()
                     
                     st.success("Data berhasil diubah")
+            
+            tombol_hapus = st.button("Hapus")
+            if tombol_hapus:
+                query = 'DELETE FROM pengeluaran WHERE id = %s'
+                cursor = cnx.cursor()
+                cursor.execute(query, (id_produk,))
+                cnx.commit()
+                st.success('Pengeluaran berhasil dihapus')
 
 # Tampilan menu Laba
 elif menu == 'Laba':
