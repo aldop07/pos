@@ -10,7 +10,7 @@ cnx = mysql.connector.connect(
     host='sql12.freesqldatabase.com',
     database='sql12593622'
 )
-
+cursor = cnx.cursor()
 query = 'SELECT id, kas_awal FROM kas'
 df = pd.read_sql(query, cnx)
 df = df.sort_values(by='id', ascending=False)
