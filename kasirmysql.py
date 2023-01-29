@@ -98,21 +98,13 @@ elif menu == 'Daftar Produk':
             
                 # Tampilkan pesan sukses
                 st.success("Data produk berhasil diubah")
-
-    # Tampilan menu hapus produk apabila di centang
-    hapus = st.checkbox('Hapus Produk')
-    if hapus:
-        query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
-        df = pd.read_sql(query, cnx)
-        id_produk = st.selectbox("Pilih ID Produk", df['id'].tolist())
-        nama = st.text_input("Nama Produk",value=df.loc[df['id'] == id_produk, 'nama'].values[0])
-        tombol_hapus = st.button("Hapus")
-        if tombol_hapus:
+        if st.button("Hapus"):
             query = 'DELETE FROM produk WHERE id = %s'
             cursor = cnx.cursor()
-            cursor.execute(query, (id_produk,))
+            cursor.execute(query, (produk,))
             cnx.commit()
             st.success('Produk berhasil dihapus')
+
  
     with col2:
         # Tambahkan form input untuk mengubah stok produk
