@@ -410,7 +410,8 @@ elif menu == 'Laba':
             total_pengeluaran_semua = result[0]
             if total_pengeluaran_semua is None:
                 total_pengeluaran_semua = 0
-                        kas_input_done = False
+            
+            kas_input_done = False
 
             if not kas_input_done:
                 cursor = cnx.cursor()
