@@ -388,6 +388,15 @@ elif menu == 'Laba':
                 belanja = 0
             belanja_rupiah = 'Rp. {:,}'.format(belanja).replace(',', '.')
             
+            # Hitung kas saat ini
+            query = 'SELECT SUM(transaksi.total) - SUM(update_produk.harga_pokok * update_produk.jumlah_update) + SUM(pengeluaran.jumlah_pengeluaran) as kas FROM transaksi JOIN update_produk ON transaksi.id_transaksi = update_produk.id_transaksi JOIN pengeluaran ON pengeluaran.id_pengeluaran = transaksi.id_pengeluaran'
+            cursor.execute(query)
+            result = cursor.fetchone()
+            kas = result[0]
+            if kas is None:
+                kas = 0
+            kas = 'Rp. {:,}'.format(kas).replace(',', '.')
+            
             if total_pengeluaran == 0 or total_transaksi == 0 or pemasukan == 0 or laba == 0 or modal_now == 0:
                 st.error('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN DAN PEMASUKAN')
             else:
@@ -397,6 +406,7 @@ elif menu == 'Laba':
                 st.write('Laba Bersih:', laba_rupiah)
                 st.write('Seluruh Modal Saat Ini:', modal_now)
                 st.write('Total Belanja :',belanja_rupiah)
+                st.write('Total Belanja :',kas)
 
 # Tampilan menu Riwayat Transaksi
 elif menu == 'Riwayat Transaksi':
