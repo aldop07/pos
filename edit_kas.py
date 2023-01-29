@@ -33,5 +33,3 @@ if st.button('Edit'):
     cnx.commit()
     st.success('Data berhasil diperbarui')
     
-cursor.close()
-cnx.close()
