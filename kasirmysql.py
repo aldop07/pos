@@ -73,7 +73,7 @@ elif menu == 'Daftar Produk':
         search = st.text_input('Cari produk', key='search')
         if search:
             df = df[df['nama'].str.contains(search, case=False, na=False)]
-        st.dataframe(df,width=1500, height=140)
+        st.dataframe(df,width=1500, height=180)
 
     # Tampilkan menu edit produk apabila di centang
     edit = st.checkbox('Edit Produk')
