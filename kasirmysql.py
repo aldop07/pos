@@ -146,6 +146,12 @@ elif menu == 'Daftar Produk':
                 cnx.commit()
 
                 st.success('Stok produk berhasil diupdate')
+    with col2:
+        cek_update = st.checkbox('Cek/Hapus Update')
+        if cek_update:
+            query = 'SELECT FROM update_produk'
+            df = pd.read_sql(query, cnx)
+            st.dataframe(df)
 
 # Tampilan menu Tambah Produk
 elif menu == 'Tambah Produk':
