@@ -105,11 +105,12 @@ elif menu == 'Daftar Produk':
             cnx.commit()
             st.success('Produk berhasil dihapus')
     #Tampilan menu cek hasil update
-    cek_update = st.checkbox('Cek/Hapus Update')
-    if cek_update:
-        query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
-        df = pd.read_sql(query, cnx)
-        st.dataframe(df)
+    with col1
+        cek_update = st.checkbox('Cek/Hapus Update')
+        if cek_update:
+            query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
+            df = pd.read_sql(query, cnx)
+            st.dataframe(df)
         
     with col2:
         # Tambahkan form input untuk mengubah stok produk
