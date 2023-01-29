@@ -1,6 +1,4 @@
 import streamlit as st
-import sqlite3
-import time
 import numpy as np
 import pandas as pd
 import mysql.connector
@@ -131,13 +129,18 @@ elif menu == 'Daftar Produk':
        df = df.sort_values(by='tanggal', ascending=False)
        st.dataframe(df,width=1500, height=100)
        produk = st.selectbox("Id Produk", df['id'].tolist())
+       jumlah = st.number_input("Jumlah", value=df.loc[df['id'] == produk, 'jumlah_update'].values[0])
        if st.button('Hapus'):
             query = 'DELETE FROM update_produk WHERE id = %s'
             cursor = cnx.cursor()
             cursor.execute(query, (produk,))
             cnx.commit()
             st.success('Produk berhasil dihapus')
-        
+       if st.button('Edit'):
+            cursor = cnx.cursor()
+            query = "UPDATE update_produk SET jumlah_update = %s WHERE id = %s"
+            cursor.execute(query, (jumlah,))
+            cnx.commit()
     with col2:
         # Tambahkan form input untuk mengubah stok produk
         query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
