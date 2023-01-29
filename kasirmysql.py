@@ -437,8 +437,8 @@ elif menu == 'Laba':
             kas_awal = result[0]
             if kas_awal is None:
                 kas_awal = 0
-                
-            kas = total_transaksi_semua - ((kas_awal - total_belanja_semua) + total_pengeluaran_semua)
+            kas_jumlah = kas_awal - (total_belanja_semua + total_pengeluaran_semua)
+            kas = total_transaksi_semua + (kas_jumlah)
             kas = 'Rp. {:,}'.format(kas).replace(',', '.')
             
             if total_pengeluaran == 0 or total_transaksi == 0 or pemasukan == 0 or laba == 0 or modal_now == 0:
