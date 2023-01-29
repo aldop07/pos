@@ -379,6 +379,15 @@ elif menu == 'Laba':
                 modal_now = 0
             modal_now = 'Rp. {:,}'.format(modal_now).replace(',', '.')
             
+            # Hitung jumlah belaja berdasarkan tanggal
+            query = 'SELECT SUM(harga_pokok * jumlah_update) FROM update_produk WHERE tanggal BETWEEN %s AND %s'
+            cursor.execute(query, (tanggal_awal, tanggal_akhir))
+            result = cursor.fetchone()
+            belanja = result[0]
+            if belanja is None:
+                belanja = 0
+            belanja_rupiah = 'Rp. {:,}'.format(belanja).replace(',', '.')
+            
             if total_pengeluaran == 0 or total_transaksi == 0 or pemasukan == 0 or laba == 0 or modal_now == 0:
                 st.error('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN DAN PEMASUKAN')
             else:
@@ -387,6 +396,7 @@ elif menu == 'Laba':
                 st.write('Keuntungan:', pemasukan_rupiah)
                 st.write('Laba Bersih:', laba_rupiah)
                 st.write('Seluruh Modal Saat Ini:', modal_now)
+                st.write('Total Belanja dari tanggal {tanggal_awal} -> {tanggal_akhir}:', belanja_rupiah)
 
 # Tampilan menu Riwayat Transaksi
 elif menu == 'Riwayat Transaksi':
