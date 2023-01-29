@@ -112,8 +112,6 @@ elif menu == 'Daftar Produk':
                 query = "UPDATE produk SET harga_pokok = %s, nama = %s, harga = %s, stok = %s WHERE id = %s"
                 cursor.execute(query, (harga_pokok, nama, harga, stok, produk))
                 cnx.commit()
-            
-                # Tampilkan pesan sukses
                 st.success("Data produk berhasil diubah")
         if st.button("Hapus"):
             query = 'DELETE FROM produk WHERE id = %s'
@@ -138,7 +136,7 @@ elif menu == 'Daftar Produk':
                 query = "UPDATE update_produk SET jumlah_update = %s WHERE id = %s"
                 cursor.execute(query, (jumlah, produk))
                 cnx.commit()
-                st.success('Produk berhasil diedit')
+                st.success('Data berhasil diedit')
             
        if st.button('Hapus'):
             query = 'DELETE FROM update_produk WHERE id = %s'
