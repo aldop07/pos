@@ -19,6 +19,14 @@ st.dataframe(df)
 id = st.selectbox("Id Produk", df['id'].tolist())
 jumlah_kas = st.number_input("Kas",value=df.loc[df['id'] == id, 'kas_awal'].values[0])
 
+
+if st.button('Edit'):
+    cursor = cnx.cursor()
+    query = "UPDATE kas SET kas_awal = %s WHERE id = %s"
+    cursor.execute(query, (jumlah_kas, id))
+    cnx.commit()
+    st.success('Data berhasil diperbarui')
+    
 if st.button('Hapus'):
     cursor = cnx.cursor()
     query = 'DELETE FROM kas WHERE id = %s'
@@ -26,10 +34,6 @@ if st.button('Hapus'):
     cnx.commit()
     st.success('Produk berhasil dihapus')
     
-if st.button('Edit'):
-    cursor = cnx.cursor()
-    query = "UPDATE kas SET kas_awal = %s WHERE id = %s"
-    cursor.execute(query, (jumlah_kas,))
-    cnx.commit()
-    st.success('Data berhasil diperbarui')
     
+cursor.close()
+cnx.close()
