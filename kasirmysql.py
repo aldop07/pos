@@ -109,7 +109,8 @@ elif menu == 'Daftar Produk':
     if cek_update:
        query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
        df = pd.read_sql(query, cnx)
-       st.dataframe(df)
+       df = df.sort_values(by='tanggal', ascending=False)
+       st.dataframe(df,height=10)
         
     with col2:
         # Tambahkan form input untuk mengubah stok produk
