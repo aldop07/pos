@@ -132,7 +132,7 @@ elif menu == 'Daftar Produk':
        jumlah = st.number_input("Jumlah", value=df.loc[df['id'] == produk, 'jumlah_update'].values[0])
        if st.button('Edit'):
            if jumlah < 1:
-                st.error('Jumlah yang diedit tidak bisa kuran dari 1')
+                st.error('Jumlah yang diedit tidak bisa kurang dari 1')
            else:
                 cursor = cnx.cursor()
                 query = "UPDATE update_produk SET jumlah_update = %s WHERE id = %s"
