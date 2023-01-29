@@ -410,28 +410,6 @@ elif menu == 'Laba':
             total_pengeluaran_semua = result[0]
             if total_pengeluaran_semua is None:
                 total_pengeluaran_semua = 0
-            
-            kas_input_done = False
-
-            if not kas_input_done:
-                cursor = cnx.cursor()
-                query = "SELECT MAX(id) FROM kas"
-                cursor.execute(query)
-                last_id = cursor.fetchone()[0]
-                if last_id is None:
-                    id = 1
-                else:
-                    id = last_id + 1
-                kas_start = st.number_input('Masukan Kas Awal',0)
-                if st.button('Input Kas'):
-                    cursor = cnx.cursor()
-                    query = 'INSERT INTO kas (id, kas_awal) VALUES (%s, %s)'
-                    cursor.execute(query, (id, kas_start))
-                    cnx.commit()
-                    st.success('Kas berhasil disimpan')
-                    kas_input_done = True
-            else:
-                st.info('Kas sudah pernah diinput')
 
             # Sum kas awal
             query = 'SELECT SUM(kas_awal) FROM kas'
