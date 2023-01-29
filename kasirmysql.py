@@ -76,7 +76,7 @@ elif menu == 'Daftar Produk':
         st.dataframe(df,width=1500, height=170)
 
     # Tampilkan menu edit produk apabila di centang
-    edit = st.checkbox('Edit Produk')
+    edit = st.checkbox('Edit/Hapus Produk')
     if edit :
         query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
         df = pd.read_sql(query, cnx)
