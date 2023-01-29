@@ -287,21 +287,7 @@ elif menu == 'Tambah Pengeluaran':
             df['jumlah_pengeluaran'] = df['jumlah_pengeluaran'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
             st.dataframe(df)
     with col2:
-        # Tampilan menu hapus produk apabila di centang
-        hapus = st.checkbox('Hapus Pengeluaran')
-        if hapus:
-            query = 'SELECT id, nama_pengeluaran, jumlah_pengeluaran, tanggal FROM pengeluaran'
-            df = pd.read_sql(query, cnx)
-            id_produk = st.selectbox("Pilih ID Produk", df['id'].tolist())
-            nama = st.text_input("Keterangan",value=df.loc[df['id'] == id_produk, 'nama_pengeluaran'].values[0])
-            tombol_hapus = st.button("Hapus")
-            if tombol_hapus:
-                query = 'DELETE FROM pengeluaran WHERE id = %s'
-                cursor = cnx.cursor()
-                cursor.execute(query, (id_produk,))
-                cnx.commit()
-                st.success('Pengeluaran berhasil dihapus')
-        
+        # Tampilan menu edit/hapus produk apabila di centang
         edit = st.checkbox('Edit/Hapus Pengeluaran')
         if edit:
             query = 'SELECT id, nama_pengeluaran, jumlah_pengeluaran, tanggal FROM pengeluaran'
