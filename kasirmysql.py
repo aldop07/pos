@@ -379,7 +379,7 @@ elif menu == 'Laba':
                 modal_now = 0
             modal_now = 'Rp. {:,}'.format(modal_now).replace(',', '.')
             
-            # Hitung jumlah belaja berdasarkan tanggal
+            # Hitung jumlah belanja berdasarkan tanggal
             query = 'SELECT SUM(harga_pokok * jumlah_update) FROM update_produk WHERE tanggal BETWEEN %s AND %s'
             cursor.execute(query, (tanggal_awal, tanggal_akhir))
             result = cursor.fetchone()
