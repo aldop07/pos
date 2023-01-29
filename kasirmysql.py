@@ -149,7 +149,7 @@ elif menu == 'Daftar Produk':
     with col2:
         cek_update = st.checkbox('Cek/Hapus Update')
         if cek_update:
-            query = 'SELECT FROM update_produk'
+            query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
             df = pd.read_sql(query, cnx)
             st.dataframe(df)
 
