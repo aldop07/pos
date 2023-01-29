@@ -110,7 +110,14 @@ elif menu == 'Daftar Produk':
        query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
        df = pd.read_sql(query, cnx)
        df = df.sort_values(by='tanggal', ascending=False)
-       st.dataframe(df,height=100)
+       st.dataframe(df,width=1500, height=100)
+       produk = st.selectbox("Id Produk", df['id'].tolist())
+       if st.button('Hapus'):
+            query = 'DELETE FROM update_produk WHERE id = %s'
+            cursor = cnx.cursor()
+            cursor.execute(query, (produk,))
+            cnx.commit()
+            st.success('Produk berhasil dihapus')
         
     with col2:
         # Tambahkan form input untuk mengubah stok produk
