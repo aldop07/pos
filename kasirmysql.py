@@ -602,3 +602,5 @@ elif menu == 'Data Mining':
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
             df = df.sort_values(by='tanggal', ascending=False)
             st.dataframe(df)
+cursor.close()
+cnx.close()
