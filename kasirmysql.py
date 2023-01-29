@@ -421,9 +421,9 @@ elif menu == 'Laba':
                 st.write('Total transaksi:', total_transaksi_rupiah)
                 st.write('Keuntungan:', pemasukan_rupiah)
                 st.write('Laba Bersih:', laba_rupiah)
-                st.write('Seluruh Modal Saat Ini:', modal_now)
                 st.write('Total Belanja :',belanja_rupiah)
                 st.write('Total Kas Saat Ini :',kas)
+                st.write('Seluruh Modal Saat Ini:', modal_now)
 
 # Tampilan menu Riwayat Transaksi
 elif menu == 'Riwayat Transaksi':
