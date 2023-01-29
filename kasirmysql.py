@@ -388,13 +388,31 @@ elif menu == 'Laba':
                 belanja = 0
             belanja_rupiah = 'Rp. {:,}'.format(belanja).replace(',', '.')
             
-            # Hitung kas saat ini
-            query = 'SELECT SUM(transaksi.total) - SUM(update_produk.harga_pokok * update_produk.jumlah_update) + SUM(pengeluaran.jumlah_pengeluaran) as kas FROM transaksi JOIN update_produk ON transaksi.id_transaksi = update_produk.id_transaksi JOIN pengeluaran ON pengeluaran.id_pengeluaran = transaksi.id_pengeluaran'
+            # Hitung jumlah semua transaksi
+            query = 'SELECT SUM(total) FROM transaksi'
             cursor.execute(query)
             result = cursor.fetchone()
-            kas = result[0]
-            if kas is None:
-                kas = 0
+            total_transaksi_semua = result[0]
+            if total_transaksi_semua is None:
+                total_transaksi_semua = 0
+
+            # Hitung jumlah semua belanja
+            query = 'SELECT SUM(harga_pokok * jumlah_update) FROM update_produk'
+            cursor.execute(query)
+            result = cursor.fetchone()
+            total_belanja_semua = result[0]
+            if total_belanja_semua is None:
+                total_belanja_semua = 0
+
+            # Hitung jumlah semua pengeluaran
+            query = 'SELECT SUM(jumlah_pengeluaran) FROM pengeluaran'
+            cursor.execute(query)
+            result = cursor.fetchone()
+            total_pengeluaran_semua = result[0]
+            if total_pengeluaran_semua is None:
+                total_pengeluaran_semua = 0
+                
+            kas = total_transaksi_semua - total_belanja_semua + total_pengeluaran_semua
             kas = 'Rp. {:,}'.format(kas).replace(',', '.')
             
             if total_pengeluaran == 0 or total_transaksi == 0 or pemasukan == 0 or laba == 0 or modal_now == 0:
