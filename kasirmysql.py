@@ -437,6 +437,8 @@ elif menu == 'Laba':
             kas_awal = result[0]
             if kas_awal is None:
                 kas_awal = 0
+                
+            # Hitung jumlah total kas dengan perhitungan
             kas_jumlah = kas_awal - (total_belanja_semua + total_pengeluaran_semua)
             kas = total_transaksi_semua + (kas_jumlah)
             kas = 'Rp. {:,}'.format(kas).replace(',', '.')
