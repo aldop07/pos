@@ -27,7 +27,6 @@ if st.button('Hapus'):
     st.success('Produk berhasil dihapus')
     
 if st.button('Edit'):
-    cursor = cnx.cursor()
     query = "UPDATE id SET kas_awal WHERE id = %s"
     cursor.execute(query, (jumlah_kas, ))
     cnx.commit()
