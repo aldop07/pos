@@ -104,8 +104,13 @@ elif menu == 'Daftar Produk':
             cursor.execute(query, (produk,))
             cnx.commit()
             st.success('Produk berhasil dihapus')
-
- 
+    #Tampilan menu cek hasil update
+    cek_update = st.checkbox('Cek/Hapus Update')
+    if cek_update:
+        query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
+        df = pd.read_sql(query, cnx)
+        st.dataframe(df)
+        
     with col2:
         # Tambahkan form input untuk mengubah stok produk
         query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
@@ -146,12 +151,6 @@ elif menu == 'Daftar Produk':
                 cnx.commit()
 
                 st.success('Stok produk berhasil diupdate')
-    with col2:
-        cek_update = st.checkbox('Cek/Hapus Update')
-        if cek_update:
-            query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
-            df = pd.read_sql(query, cnx)
-            st.dataframe(df)
 
 # Tampilan menu Tambah Produk
 elif menu == 'Tambah Produk':
