@@ -28,8 +28,8 @@ if st.button('Hapus'):
     
 if st.button('Edit'):
     cursor = cnx.cursor()
-    query = "UPDATE id SET id = %s, kas_awal WHERE id = %s"
-    cursor.execute(query, (id, jumlah_kas))
+    query = "UPDATE id SET kas_awal WHERE id = %s"
+    cursor.execute(query, (jumlah_kas, ))
     cnx.commit()
     st.success('Data berhasil diperbarui')
     
