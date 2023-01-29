@@ -466,7 +466,7 @@ elif menu == 'Laba':
 elif menu == 'Riwayat Transaksi':
     st.header('Riwayat Transaksi')
     col1, col2 = st.columns(2)
-    query = 'SELECT  tanggal,nama_pelanggan, nama, jumlah, harga, total FROM transaksi'
+    query = 'SELECT  tanggal, id, nama_pelanggan, nama, jumlah, harga, total FROM transaksi'
     df = pd.read_sql(query, cnx)
     df = df.sort_values(by='tanggal', ascending=False)
     
