@@ -417,11 +417,14 @@ elif menu == 'Laba':
             if total_pengeluaran == 0 or total_transaksi == 0 or pemasukan == 0 or laba == 0 or modal_now == 0:
                 st.error('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN DAN PEMASUKAN')
             else:
+                st.info('PERHITUNGAN BERDASARKAN PARAMETER TANGGAL AWAL -> AKHIR')
                 st.write('Total Pengeluaran:', total_pengeluaran_rupiah)
                 st.write('Total transaksi:', total_transaksi_rupiah)
                 st.write('Keuntungan:', pemasukan_rupiah)
                 st.write('Laba Bersih:', laba_rupiah)
                 st.write('Total Belanja :',belanja_rupiah)
+                
+                st.info('PERHITUNGAN TANPA PARAMETER TANGGAL AWAL -> AKHIR')
                 st.write('Total Kas Saat Ini :',kas)
                 st.write('Seluruh Modal Saat Ini:', modal_now)
 
