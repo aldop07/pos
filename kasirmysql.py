@@ -607,14 +607,13 @@ elif menu == 'Data Mining':
             df = pd.read_sql(query, cnx,params=(nama_item,))
             df.set_index('tanggal', inplace=True)
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
-            df['temp_jumlah'] = df['jumlah'].shift(1).rolling(window=average).mean()
-            df['temp_jumlah'].fillna(df['jumlah'].mean(), inplace=True)
-            df['jumlah'] = df['temp_jumlah']
-            df.drop('temp_jumlah', axis=1, inplace=True)
-            df = df.fillna(0)
+            df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
+            df['moving_avg'].fillna(df['jumlah'].mean(), inplace=True)
+            df['jumlah'].fillna(df['moving_avg'], inplace=True)
             last_date = df['tanggal'].max()
             new_date_range = pd.date_range(last_date + pd.Timedelta(1, unit='D'), periods=tambah_baris, freq='D')
             df = pd.concat([df, new_date_range])
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
+            df = df.fillna(0)
             st.dataframe(df)
 
