@@ -604,6 +604,7 @@ elif menu == 'Data Mining':
             query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = %s"
             df = pd.read_sql(query, cnx,params=(nama_item,))
             df.set_index('tanggal', inplace=True)
+            df = df.fillna(0)
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
             df = df.sort_values(by='tanggal', ascending=False)
