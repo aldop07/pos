@@ -601,6 +601,7 @@ elif menu == 'Data Mining':
         df = pd.read_sql(query, cnx)
         nama_item = st.selectbox("Pilih produk ", df['nama'].tolist())
         average = st.number_input('Masukan Jumlah Rentang',min_value=1) 
+        tambah_baris = st.number_input('Tambahkan Baris',0')
         if st.button('CEK FORECASTING'):
             query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = %s"
             df = pd.read_sql(query, cnx,params=(nama_item,))
@@ -608,13 +609,5 @@ elif menu == 'Data Mining':
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
             df = df.fillna(0)
-            jumlah_mean = df['jumlah'].mean()
-            for i in range(len(df)):
-                if df.iloc[i]['moving_avg'] == 0:
-                    df.iloc[i]['moving_avg'] = jumlah_mean
-                elif i == len(df) - 1:
-                    new_row = [None, (df.iloc[i]['moving_avg'] + df.iloc[i-1]['moving_avg'])/average, (df.iloc[i]['moving_avg'] + df.iloc[i-1]['moving_avg'])/average]
-                    df.loc[len(df)] = new_row
-                else:
-                    continue
+            df = pd.concat([df, pd.DataFrame(index=range(tambah_baris), columns=df.columns)])
             st.dataframe(df)
