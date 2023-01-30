@@ -604,13 +604,4 @@ elif menu == 'Data Mining':
         if st.button('CEK FORECASTING'):
             query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = %s"
             df = pd.read_sql(query, cnx,params=(nama_item,))
-            df.set_index('tanggal', inplace=True)
-            df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
-            df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
-            df = df.fillna(0)
-            df['tanggal'] = df.index
-            last_date = df['tanggal'].iloc[-1]
-            next_date = last_date + pd.Timedelta(days=1)
-            df = df.append({'tanggal':next_date, 'jumlah':0, 'moving_avg':df['moving_avg'].iloc[-1]}, ignore_index=True)
-            df['forecast'] = df['moving_avg'].shift(-1)
             st.dataframe(df)
