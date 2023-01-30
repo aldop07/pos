@@ -5,6 +5,7 @@ import mysql.connector
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mlxtend.frequent_patterns import apriori, association_rules
+from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 
 #   IRFAN NOVALDO HUANG
 
@@ -609,13 +610,11 @@ elif menu == 'Data Mining':
             df = df.sort_values(by='tanggal', ascending=False)
             df = df.fillna(0)
             st.dataframe(df)
-            # Prediksi 5 tanggal selanjutnya
-            last_date = df['tanggal'].iloc[0]
-            next_dates = []
-            for i in range(5):
-                next_dates.append(last_date + timedelta(days=i+1))
-            next_dates_df = pd.DataFrame({'tanggal': next_dates})
-            next_dates_df['jumlah'] = 0
-            next_dates_df['moving_avg'] = 0
-            df = pd.concat([df, next_dates_df])
+            # Fitting the Simple Exponential Smoothing model
+            fit = SimpleExpSmoothing(df['jumlah']).fit(smoothing_level=0.2,optimized=False)
 
+            # Predicting the next 5 days
+            forecast = fit.forecast(steps=5)
+            future_dates = pd.date_range(start=df.index[-1], periods=5, freq='D')
+            forecast_df = pd.DataFrame({'Forecast': forecast}, index=future_dates)
+            st.dataframe(forecast_df)
