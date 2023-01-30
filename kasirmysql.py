@@ -5,7 +5,6 @@ import mysql.connector
 import matplotlib.pyplot as plt
 import plotly.express as px
 from mlxtend.frequent_patterns import apriori, association_rules
-from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 
 #   IRFAN NOVALDO HUANG
 
@@ -607,9 +606,6 @@ elif menu == 'Data Mining':
             df = pd.read_sql(query, cnx,params=(nama_item,))
             df.set_index('tanggal', inplace=True)
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
-            df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
-            df['moving_avg'].fillna(df['jumlah'].mean(), inplace=True)
-            df['jumlah'].fillna(df['moving_avg'], inplace=True)
             df = df.fillna(0)
             last_date = df['tanggal'].max()
             new_date_range = pd.date_range(last_date + pd.Timedelta(1, unit='D'), periods=tambah_baris, freq='D')
