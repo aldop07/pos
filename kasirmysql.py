@@ -600,18 +600,13 @@ elif menu == 'Data Mining':
         df = pd.read_sql(query, cnx)
         nama_item = st.selectbox("Pilih produk ", df['nama'].tolist())
         average = st.number_input('Masukan Jumlah Rentang',min_value=1) 
-        jumlah_prediksi = st.number_input('Masukan jumlah hari yang ingin di prediksi',0)
+        jumlah_prediksi = st.number_input('Masukan jumlah hari',0)
         if st.button('CEK FORECASTING'):
             query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = %s"
             df = pd.read_sql(query, cnx,params=(nama_item,))
             df.set_index('tanggal', inplace=True)
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
+            df = df.sort_values(by='tanggal', ascending=False)
+            df = df.fillna(0)
             st.dataframe(df)
-            pred = [df['moving_avg'].tail(1) + (df['moving_avg'].tail(1) - df['moving_avg'].tail(average))]
-            for i in range(jumlah_prediksi - 1):
-                pred.append(pred[-1] + (pred[-1] - pred[-average]))
-
-            index = pd.date_range(df.index[-1], periods=jumlah_prediksi, freq='D')
-            pred_df = pd.DataFrame({'Prediksi': pred}, index=index)
-            st.dataframe(pred_df)
