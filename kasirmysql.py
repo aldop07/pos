@@ -608,5 +608,13 @@ elif menu == 'Data Mining':
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
             df = df.fillna(0)
-            df.loc[len(df)] = [None, df['jumlah'].mean()]
+            jumlah_mean = df['jumlah'].mean()
+            for i in range(len(df)):
+                if df.iloc[i]['moving_avg'] == 0:
+                    df.iloc[i]['moving_avg'] = jumlah_mean
+                elif i == len(df) - 1:
+                    new_row = [None, (df.iloc[i]['moving_avg'] + df.iloc[i-1]['moving_avg'])/2, (df.iloc[i]['moving_avg'] + df.iloc[i-1]['moving_avg'])/2]
+                    df.loc[len(df)] = new_row
+                else:
+                    continue
             st.dataframe(df)
