@@ -606,7 +606,7 @@ elif menu == 'Data Mining':
             df = pd.read_sql(query, cnx,params=(nama_item,))
             df.set_index('tanggal', inplace=True)
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
-            df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
+            df['moving_avg'] = df['jumlah'].rolling(window=average).mean()
             df = df.fillna(0)
             st.dataframe(df)
 
@@ -614,10 +614,13 @@ elif menu == 'Data Mining':
             for i in range(jumlah_prediksi):
                 last_date = df['tanggal'].iloc[-1]
                 next_date = last_date + pd.Timedelta(days=1)
+                last_moving_avg = df['moving_avg'].iloc[-1]
+                next_moving_avg = (last_moving_avg*average + df['jumlah'].iloc[-1])/(average+1)
                 new_row = pd.DataFrame({
                     'tanggal': [next_date],
-                    'jumlah': [df['moving_avg'].iloc[-1]],
-                    'moving_avg': [df['moving_avg'].iloc[-average:].mean()]
+                    'jumlah': [df['jumlah'].iloc[-1]],
+                    'moving_avg': [next_moving_avg]
                 })
                 df = pd.concat([df, new_row])
             st.dataframe(df)
+
