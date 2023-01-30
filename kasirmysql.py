@@ -608,9 +608,13 @@ elif menu == 'Data Mining':
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
             df = df.sort_values(by='tanggal', ascending=False)
             st.dataframe(df)
-            forecast_dates = pd.date_range(df.index[-1], periods=5, freq='D').strftime('%Y-%m-%d')
-            forecast = pd.DataFrame(forecast_dates, columns=['tanggal'])
-            forecast['prediksi'] = df['moving_avg'].iloc[-1]
-            forecast.set_index('tanggal', inplace=True)
-            st.dataframe(forecast)
+            # Prediksi 5 tanggal selanjutnya
+            last_date = df['tanggal'].iloc[0]
+            next_dates = []
+            for i in range(5):
+                next_dates.append(last_date + timedelta(days=i+1))
+            next_dates_df = pd.DataFrame({'tanggal': next_dates})
+            next_dates_df['jumlah'] = 0
+            next_dates_df['moving_avg'] = 0
+            df = pd.concat([df, next_dates_df])
 
