@@ -613,7 +613,7 @@ elif menu == 'Data Mining':
                 if df.iloc[i]['moving_avg'] == 0:
                     df.iloc[i]['moving_avg'] = jumlah_mean
                 elif i == len(df) - 1:
-                    new_row = [None, (df.iloc[i]['moving_avg'] + df.iloc[i-1]['moving_avg'])/2, (df.iloc[i]['moving_avg'] + df.iloc[i-1]['moving_avg'])/2]
+                    new_row = [None, (df.iloc[i]['moving_avg'] + df.iloc[i-1]['moving_avg'])/average, (df.iloc[i]['moving_avg'] + df.iloc[i-1]['moving_avg'])/average]
                     df.loc[len(df)] = new_row
                 else:
                     continue
