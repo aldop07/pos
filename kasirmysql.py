@@ -593,7 +593,7 @@ elif menu == 'Data Mining':
                 # Menampilkan hasil algoritma apriori dalam bentuk dataframe
                 st.dataframe(rules.applymap(lambda x: ','.join(x) if type(x) == frozenset else x))
 
-        elif sub_menu == 'Forecasting':
+     elif sub_menu == 'Forecasting':
             st.header('Forecasting')
             st.info('BELUM FIX')
             query = "SELECT nama FROM produk"
