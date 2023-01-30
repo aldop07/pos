@@ -607,6 +607,6 @@ elif menu == 'Data Mining':
             df.set_index('tanggal', inplace=True)
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
-            df['forecast'] = df['moving_avg'].shift(1).rolling(window=average).mean()
             df = df.fillna(0)
+            df.loc[len(df)] = [None, df['jumlah'].mean()]
             st.dataframe(df)
