@@ -608,9 +608,9 @@ elif menu == 'Data Mining':
             df.set_index('tanggal', inplace=True)
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
+            df = df.fillna(0)
             last_date = df['tanggal'].max()
             new_date_range = pd.date_range(last_date, periods=tambah_baris, freq='D')
             new_df = pd.DataFrame({'tanggal': new_date_range, 'jumlah': [0]*tambah_baris, 'moving_avg': [0]*tambah_baris})
-            df = pd.concat([df, new_df]
-            df = df.fillna(0)
+            df = pd.concat([df, new_df])
             st.dataframe(df)
