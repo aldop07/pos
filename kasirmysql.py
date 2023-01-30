@@ -616,4 +616,4 @@ elif menu == 'Data Mining':
             forecast_df = pd.DataFrame({'Forecast': forecast}, index=future_dates)
 
             # Show the forecast
-            st.line_chart(forecast_df)
+            st.dataframe(forecast_df)
