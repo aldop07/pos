@@ -611,13 +611,24 @@ elif menu == 'Data Mining':
             st.dataframe(df)
 
             # forecasting loop
+            #for i in range(jumlah_prediksi):
+             #   last_date = df['tanggal'].iloc[-1]
+             #   next_date = last_date + pd.Timedelta(days=1)
+             #   new_row = pd.DataFrame({
+             #       'tanggal': [next_date],
+             #       'moving_avg': [df['jumlah'].iloc[-average:].mean()],
+             #       'jumlah': [new_row['moving_avg'].iloc[-1]]
+             #   })
+             #   df = pd.concat([df, new_row])
+            #st.dataframe(df)
             for i in range(jumlah_prediksi):
                 last_date = df['tanggal'].iloc[-1]
                 next_date = last_date + pd.Timedelta(days=1)
+                moving_avg = df['jumlah'].iloc[-average:].mean()
                 new_row = pd.DataFrame({
                     'tanggal': [next_date],
-                    'moving_avg': [df['jumlah'].iloc[-average:].mean()],
-                    'jumlah': [new_row['moving_avg'].iloc[-1]]
+                    'moving_avg': [moving_avg],
+                    'jumlah': [moving_avg]
                 })
                 df = pd.concat([df, new_row])
             st.dataframe(df)
