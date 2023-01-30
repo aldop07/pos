@@ -607,11 +607,5 @@ elif menu == 'Data Mining':
             df.set_index('tanggal', inplace=True)
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
-            df = df.sort_values(by='tanggal', ascending=False)
             df = df.fillna(0)
             st.dataframe(df)
-            df['forecast'] = df['moving_avg'].shift(-1)
-            df = df.fillna(0)
-            next_date = df.index[-1] + pd.DateOffset(1)
-            forecast = df.loc[df.index[-1], 'forecast']
-            st.write("Forecast untuk tanggal", next_date, "adalah", forecast)
