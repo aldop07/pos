@@ -607,22 +607,12 @@ elif menu == 'Data Mining':
             df = pd.read_sql(query, cnx,params=(nama_item,))
             df.set_index('tanggal', inplace=True)
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
-            df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
+            df['moving_avg'] = df['jumlah'].rolling(window=average).mean()
             df = df.fillna(0)
             last_date = df['tanggal'].max()
             new_date_range = pd.date_range(last_date + pd.Timedelta(1, unit='D'), periods=tambah_baris, freq='D')
             new_df = pd.DataFrame({'tanggal': new_date_range, 'jumlah': [0]*tambah_baris, 'moving_avg': [0]*tambah_baris})
             df = pd.concat([df, new_df])
-
-            # Calculate moving average for the new rows
-            for i in range(tambah_baris):
-                if i == 0:
-                    df.iloc[-tambah_baris + i, 2] = df.iloc[-tambah_baris + i - 1, 1]
-                else:
-                    df.iloc[-tambah_baris + i, 2] = (df.iloc[-tambah_baris + i - 1, 1] + df.iloc[-tambah_baris + i - 2, 1]) / 2
-
-            # Fill in the missing values for the "jumlah" column
-            for i in range(df.shape[0] - tambah_baris, df.shape[0]):
-                df.iloc[i, 1] = df.iloc[i, 2]
-
+            df['moving_avg'] = df['jumlah'].rolling(window=average).mean().fillna(method='bfill')
             st.dataframe(df)
+
