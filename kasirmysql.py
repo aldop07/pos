@@ -610,11 +610,10 @@ elif menu == 'Data Mining':
             df = df.sort_values(by='tanggal', ascending=False)
             df = df.fillna(0)
             st.dataframe(df)
-            # Fitting the Simple Exponential Smoothing model
-            fit = SimpleExpSmoothing(df['jumlah']).fit(smoothing_level=0.2,optimized=False)
-
-            # Predicting the next 5 days
-            forecast = fit.forecast(steps=5)
-            future_dates = pd.date_range(start=df.index[-1], periods=5, freq='D')
+            # Make predictions
+            forecast = df['moving_avg'].mean()
+            future_dates = pd.date_range(start=df.index[-1], periods=5, freq='D').strftime('%Y-%m-%d')
             forecast_df = pd.DataFrame({'Forecast': forecast}, index=future_dates)
-            st.dataframe(forecast_df)
+
+            # Show the forecast
+            st.line_chart(forecast_df)
