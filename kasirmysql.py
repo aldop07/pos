@@ -617,7 +617,7 @@ elif menu == 'Data Mining':
                 new_row = pd.DataFrame({
                     'tanggal': [next_date],
                     'moving_avg': [df['jumlah'].iloc[-average:].mean()],
-                    'jumlah': [df['moving_avg']]
+                    'jumlah': [df['moving_avg'].iloc[-1]]
                 })
                 df = pd.concat([df, new_row])
             st.dataframe(df)
