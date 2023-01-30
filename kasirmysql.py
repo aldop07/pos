@@ -608,8 +608,6 @@ elif menu == 'Data Mining':
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
             df = df.fillna(0)
-            st.dataframe(df)
-
             # forecasting loop
             #for i in range(jumlah_prediksi):
              #   last_date = df['tanggal'].iloc[-1]
@@ -631,4 +629,5 @@ elif menu == 'Data Mining':
                     'jumlah': [moving_avg]
                 })
                 df = pd.concat([df, new_row])
+            pd.options.display.float_format = '{:,.2f}'.format
             st.dataframe(df)
