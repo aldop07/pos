@@ -612,7 +612,6 @@ elif menu == 'Data Mining':
             st.dataframe(df)
             # Make predictions
             forecast = df['moving_avg'].mean()
-            future_dates = pd.date_range(start=df.index[-1], periods=5, freq='D').strftime('%Y-%m-%d')
             forecast_df = pd.DataFrame({'Forecast': forecast}, index=future_dates)
 
             # Show the forecast
