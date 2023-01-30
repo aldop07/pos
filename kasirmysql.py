@@ -608,3 +608,10 @@ elif menu == 'Data Mining':
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
             df = df.sort_values(by='tanggal', ascending=False)
             st.dataframe(df)
+            prediction_df = df.copy()
+            prediction_df['tanggal'] = prediction_df['tanggal'].max() + pd.DateOffset(days=1)
+            for i in range(1,6):
+            prediction_df.loc[len(prediction_df)] = [prediction_df['tanggal'].max() + pd.DateOffset(days=1), prediction_df['moving_avg'].iloc[-1]]
+            prediction_df = prediction_df[['tanggal','jumlah']]
+            st.dataframe(prediction_df)
+
