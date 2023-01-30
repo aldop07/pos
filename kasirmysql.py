@@ -629,6 +629,6 @@ elif menu == 'Data Mining':
                     'jumlah': [moving_avg]
                 })
                 df = pd.concat([df, new_row])
-            df['moving_avg'] = df['moving_avg'].apply(lambda x: '{:,.6f}'.format(x).replace(',', '.'))
+            df['moving_avg'] = df['moving_avg'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
             df['jumlah'] = df['jumlah'].apply(lambda x: int(x) if x == x else x)
             st.dataframe(df)
