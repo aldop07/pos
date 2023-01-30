@@ -599,8 +599,8 @@ elif menu == 'Data Mining':
         query = "SELECT nama FROM produk"
         df = pd.read_sql(query, cnx)
         nama_item = st.selectbox("Pilih produk ", df['nama'].tolist())
-        average = st.number_input('Masukan Jumlah Rentang',min_value=1) 
-        jumlah_prediksi = st.number_input('Masukan jumlah hari',0)
+        average = st.number_input('Jumlah Rentang',min_value=1) 
+        jumlah_prediksi = st.number_input('Jumlah Hari Prediksi',0)
         if st.button('CEK FORECASTING'):
             query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = %s"
             df = pd.read_sql(query, cnx,params=(nama_item,))
