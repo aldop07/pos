@@ -614,11 +614,10 @@ elif menu == 'Data Mining':
             for i in range(jumlah_prediksi):
                 last_date = df['tanggal'].iloc[-1]
                 next_date = last_date + pd.Timedelta(days=1)
-                moving_avg = (df['jumlah'].iloc[-average:].sum() + df['moving_avg'].iloc[-1]) / average
                 new_row = pd.DataFrame({
                     'tanggal': [next_date],
-                    'jumlah': [df['jumlah'].iloc[-1]],
-                    'moving_avg': [moving_avg]
+                    'jumlah': [df['moving_avg'].iloc[-1]],
+                    'moving_avg': [df['moving_avg'].iloc[-average:].mean()]
                 })
                 df = pd.concat([df, new_row])
             st.dataframe(df)
