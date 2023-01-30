@@ -603,15 +603,16 @@ elif menu == 'Data Mining':
         average = st.number_input('Masukan Jumlah Rentang',min_value=1) 
         tambah_baris = st.number_input('Tambahkan Baris',0)
         if st.button('CEK FORECASTING'):
-            query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = %s"
-            df = pd.read_sql(query, cnx,params=(nama_item,))
-            df.set_index('tanggal', inplace=True)
-            df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
-            df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
-            df = df.fillna(0)
-            last_date = df['tanggal'].max()
-            new_date_range = pd.date_range(last_date + pd.Timedelta(1, unit='D'), periods=tambah_baris, freq='D')
-            new_df = pd.DataFrame({'tanggal': new_date_range, 'jumlah': df['moving_avg'].iloc[-1]*tambah_baris, 'moving_avg': df['moving_avg'].iloc[-1]*tambah_baris})
-            df = pd.concat([df, new_df])
-            df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
-            st.dataframe(df)
+                    query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = %s"
+                    df = pd.read_sql(query, cnx,params=(nama_item,))
+                    df.set_index('tanggal', inplace=True)
+                    df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
+                    df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
+                    df = df.fillna(0)
+                    last_date = df['tanggal'].max()
+                    new_date_range = pd.date_range(last_date + pd.Timedelta(1, unit='D'), periods=tambah_baris, freq='D')
+                    new_df = pd.DataFrame({'tanggal': new_date_range, 'jumlah': [0]*tambah_baris, 'moving_avg': [0]*tambah_baris})
+                    df = pd.concat([df, new_df])
+                    df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
+                    df['jumlah'] = df['moving_avg']
+                    st.dataframe(df)
