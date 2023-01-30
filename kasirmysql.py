@@ -618,6 +618,5 @@ elif menu == 'Data Mining':
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
             for i, row in df.iterrows():
                 if row['jumlah'] == 0:
-                    df.at[i, 'moving_avg'] = df.loc[i, 'moving_avg'] + df.loc[i, 'jumlah']
-            df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()    
+                    df.at[i, 'moving_avg'] = df.loc[i, 'moving_avg'] + df.loc[i, 'jumlah']  
             st.dataframe(df)
