@@ -610,10 +610,16 @@ elif menu == 'Data Mining':
             df = df.sort_values(by='tanggal', ascending=False)
             df = df.fillna(0)
             st.dataframe(df)
-            # Make predictions
-            forecast = df['moving_avg'].mean()
-            future_dates = pd.date_range(start=df.index[-1], periods=5, freq='D').strftime('%Y-%m-%d')
-            forecast_df = pd.DataFrame({'Forecast': forecast}, index=future_dates)
+            # Add 5 future dates
+            future_dates = [df['tanggal'].iloc[-1] + timedelta(days=x) for x in range(1, 6)]
+            future_df = pd.DataFrame({'tanggal': future_dates})
+            future_df = future_df.set_index('tanggal')
 
-            # Show the forecast
-            st.dataframe(forecast_df)
+            # Predict moving average for future dates
+            future_df['jumlah'] = df['moving_avg'].iloc[-1]
+            future_df['moving_avg'] = future_df['jumlah'].rolling(window=average).mean().shift(1)
+            future_df = future_df.sort_values(by='tanggal', ascending=False)
+
+            # Combine with original dataframe
+            df = pd.concat([df, future_df])
+            st.dataframe(df)
