@@ -595,7 +595,7 @@ elif menu == 'Data Mining':
 
     elif sub_menu == 'Forecasting':
         st.header('Forecasting')
-        st.info('BELUM FIX')
+        st.info('Forecasting dengan Moving Average')
         query = "SELECT nama FROM produk"
         df = pd.read_sql(query, cnx)
         nama_item = st.selectbox("Pilih produk ", df['nama'].tolist())
