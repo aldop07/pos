@@ -615,4 +615,3 @@ elif menu == 'Data Mining':
             df = pd.concat([df, new_df])
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
             st.dataframe(df)
-
