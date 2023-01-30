@@ -611,7 +611,7 @@ elif menu == 'Data Mining':
                     df = df.fillna(0)
                     last_date = df['tanggal'].max()
                     new_date_range = pd.date_range(last_date + pd.Timedelta(1, unit='D'), periods=tambah_baris, freq='D')
-                    new_df = pd.DataFrame({'tanggal': new_date_range, 'jumlah': [0]*tambah_baris, 'moving_avg': [0]*tambah_baris})
+                    new_df = pd.DataFrame({'tanggal': new_date_range})
                     df = pd.concat([df, new_df])
                     new_df['jumlah'] = new_df['moving_avg']
                     new_df['moving_avg'] = new_df['jumlah'].shift(1).rolling(window=average).mean()
