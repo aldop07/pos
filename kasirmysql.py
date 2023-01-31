@@ -286,10 +286,11 @@ elif menu == 'Tambah Transaksi':
                     else:
                         st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
     with col1:
+        cursor = cnx.cursor()
         query = "SELECT MAX(id) FROM produk"
         cursor.execute(query)
         result1 = cursor.fetchone()
-        id = result1[0]
+        id_1 = result1[0]
         cursor = cnx.cursor()
         query = 'SELECT SUM(total) from transaksi WHERE id = %s'
         cursor.execute(query,(id,))
@@ -298,7 +299,7 @@ elif menu == 'Tambah Transaksi':
         kembalian = jumlah_bayar - total
         total_rupiah = 'Rp. {:,}'.format(total).replace(',', '.')
         kembalian_rupiah = 'Rp. {:,}'.format(kembalian).replace(',', '.')
-        st.write("ID :",id)
+        st.write("ID :",id_1)
         st.write("Jumlah Belanja: ", total_rupiah)
         st.write("Uang Kembalian: ", kembalian_rupiah)
 
