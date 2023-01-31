@@ -239,8 +239,11 @@ elif menu == 'Tambah Transaksi':
             id = last_id + 1
         tanggal = st.date_input('Tanggal')
         nama_pelanggan = st.text_input ('Nama Pelanggan')
+        jumlah_bayar = st.number_input ('Bayar',0)
+        kembalian = jumlah_bayar - total_harga
     with col2:
         nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
+        jumlah_kembalian = st.write('Kembalian :'kembalian')
         jumlah_produk = []
         total_harga = 0
     with col2 , col3:
