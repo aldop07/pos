@@ -285,11 +285,14 @@ elif menu == 'Tambah Transaksi':
                         st.error(f'Stok produk {produk_stok_tidak_mencukupi[0]} tidak mencukupi')
                     else:
                         st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
-    query = "SELECT * FROM transaksi"
-    df = pd.read_sql(query, cnx)
-
-    # mencari duplikat id
-    duplicates = df[df.duplicated(subset='id', keep=False)]
+    cursor = cnx.cursor()
+    query = "SELECT id, SUM(total) FROM transaksi GROUP BY id"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    for row in result:
+        id = row[0]
+        total = row[1]
+        st.info('total harga {}'.format(total))
 
     # mengambil data dengan id terbesar
     max_id = duplicates['id'].max()
