@@ -277,8 +277,8 @@ elif menu == 'Tambah Transaksi':
                         produk_stok_tidak_mencukupi.append(nama_produk[i])
 
                 if transaksi_berhasil:
-                    cnx.commit()
                     kembalian = jumlah_bayar - total_harga
+                    cnx.commit()
                     st.balloons()
                     st.success('Transaksi berhasil dengan jumlah kembalian : ',kembalian)
                 else:
