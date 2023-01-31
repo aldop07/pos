@@ -15,7 +15,7 @@ cnx = mysql.connector.connect(
     host='sql12.freesqldatabase.com',
     database='sql12593622'
 )
-cursor = cnx.cursor()
+
 # Buat titit
 icon = 'https://e7.pngegg.com/pngimages/263/96/png-clipart-hijab-islam-islamic-background-brown-food-thumbnail.png'
 st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
@@ -293,7 +293,7 @@ elif menu == 'Tambah Transaksi':
         id_1 = result1[0]
         cursor = cnx.cursor()
         query = 'SELECT SUM(total) from transaksi WHERE id = %s'
-        cursor.execute(query,(id,))
+        cursor.execute(query,(id_1,))
         result = cursor.fetchone()
         total = result[0]
         kembalian = jumlah_bayar - total
