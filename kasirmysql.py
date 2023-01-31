@@ -240,7 +240,6 @@ elif menu == 'Tambah Transaksi':
         tanggal = st.date_input('Tanggal')
         nama_pelanggan = st.text_input ('Nama Pelanggan')
         jumlah_bayar = st.number_input ('Bayar',0)
-        kembalian = jumlah_bayar - total_harga
     with col2:
         nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
         jumlah_kembalian = st.write('Kembalian :',kembalian)
@@ -274,6 +273,7 @@ elif menu == 'Tambah Transaksi':
                         # Kurangi stok produk yang dibeli
                         query = 'UPDATE produk SET stok = stok - %s WHERE nama = %s;'
                         cursor.execute(query, (jumlah_produk[i], nama_produk[i]))
+                        kembalian = jumlah_bayar - total_harga
                     else:
                         transaksi_berhasil = False
                         produk_stok_tidak_mencukupi.append(nama_produk[i])
