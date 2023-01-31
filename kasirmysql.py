@@ -305,8 +305,6 @@ elif menu == 'Tambah Transaksi':
                         st.error(f'Stok produk {produk_stok_tidak_mencukupi[0]} tidak mencukupi')
                     else:
                         st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
-    with col1:
-
 
 # Tampilan menu Tambah Pengeluaran
 elif menu == 'Tambah Pengeluaran':
