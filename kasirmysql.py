@@ -287,7 +287,7 @@ elif menu == 'Tambah Transaksi':
                         st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
     with col1:
         cursor = cnx.cursor()
-        query = "SELECT MAX(id) FROM produk"
+        query = "SELECT SUM(id) FROM produk"
         cursor.execute(query)
         result1 = cursor.fetchone()
         id_1 = result1[0]
