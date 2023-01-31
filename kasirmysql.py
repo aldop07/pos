@@ -301,9 +301,11 @@ elif menu == 'Tambah Transaksi':
         kembalian = jumlah_bayar - total
         total_rupiah = 'Rp. {:,}'.format(total).replace(',', '.')
         kembalian_rupiah = 'Rp. {:,}'.format(kembalian).replace(',', '.')
+        bayar = 'Rp. {:,}'.format(jumlah_bayar).replace(',', '.')
         st.write("ID :",id_1)
-        st.write("Jumlah Belanja: ", total_rupiah)
-        st.write("Uang Kembalian: ", kembalian_rupiah)
+        st.write("Jumlah Belanja : ", total_rupiah)
+        st.write("Jumlah Bayar :", bayar)
+        st.write("Uang Kembalian : ", kembalian_rupiah)
 
 # Tampilan menu Tambah Pengeluaran
 elif menu == 'Tambah Pengeluaran':
