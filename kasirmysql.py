@@ -265,11 +265,6 @@ elif menu == 'Tambah Transaksi':
                     harga_pokok = result[1]
                     stok_produk = result[2]
                     total_harga = harga_produk * jumlah_produk[i]
-                    if total_harga is None:
-                        id = 0
-                    else:
-                        id = total_harga
-                    kembalian = jumlah_bayar - total_harga
                     if stok_produk >= jumlah_produk[i]:
                         # Tambahkan transaksi baru ke tabel transaksi
                         query = 'INSERT INTO transaksi (id, tanggal, nama_pelanggan, nama, jumlah, harga, harga_pokok, total) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
@@ -284,7 +279,7 @@ elif menu == 'Tambah Transaksi':
                 if transaksi_berhasil:
                     cnx.commit()
                     st.balloons()
-                    st.success('Transaksi berhasil dengan jumlah kembalian : ',kembalian)
+                    st.success('Transaksi berhasil dengan jumlah kembalian : ',total_harga)
                 else:
                     cnx.rollback()
                     if len(produk_stok_tidak_mencukupi) == 1:
