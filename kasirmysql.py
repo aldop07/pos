@@ -285,20 +285,20 @@ elif menu == 'Tambah Transaksi':
                         st.error(f'Stok produk {produk_stok_tidak_mencukupi[0]} tidak mencukupi')
                     else:
                         st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
-    cursor = cnx.cursor()
-    query = "SELECT id, SUM(total) FROM transaksi GROUP BY id"
-    cursor.execute(query)
-    result = cursor.fetchall()
-    for row in result:
-        id = row[0]
-        total = row[1]
-        st.info('total harga {}'.format(total))
+        jumlah_bayar = st.number_input ('Bayar',100000)
+        cursor = cnx.cursor()
+        query = "SELECT MAX(id) FROM produk"
+        cursor.execute(query)
+        id = cursor.fetchone()[0]
 
-    # mengambil data dengan id terbesar
-    max_id = duplicates['id'].max()
-    max_total = duplicates[duplicates['id'] == max_id]['total'].iloc[0]
-    kembalian = jumlah_bayar - max_total
-    st.info('Jumlah kembalian', kembalian)
+        cursor = ncx.cursor()
+        query = 'SELECT SUM(total) from transaksi WHERE id = %s'
+        cursor.execute(query,(id,))
+        result = cursor.fetchone()
+        total = result[0]
+
+        kembalian = jumlah_bayar - total
+        st.info("Kembalian: ", kembalian)
 
 # Tampilan menu Tambah Pengeluaran
 elif menu == 'Tambah Pengeluaran':
