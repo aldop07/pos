@@ -298,6 +298,7 @@ elif menu == 'Tambah Transaksi':
         total = result[0]
 
         kembalian = jumlah_bayar - total
+        kembalian_rupiah = 'Rp. {:,}'.format(kembalian).replace(',', '.')
         st.write("Kembalian: ", kembalian)
 
 # Tampilan menu Tambah Pengeluaran
