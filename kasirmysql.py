@@ -244,6 +244,7 @@ elif menu == 'Tambah Transaksi':
         nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
         jumlah_produk = []
         total_harga = 0
+        kembalian = jumlah_bayar - total_harga
     with col2 , col3:
         for produk in nama_produk:
             jumlah = st.number_input(f'Jumlah Produk {produk}',min_value=0)
@@ -255,7 +256,6 @@ elif menu == 'Tambah Transaksi':
             else:
                 # Buat objek cursor
                 cursor = cnx.cursor()
-                total_harga = 0
                 transaksi_berhasil = True
                 produk_stok_tidak_mencukupi = []
                 for i in range(len(nama_produk)):
@@ -280,7 +280,7 @@ elif menu == 'Tambah Transaksi':
                 if transaksi_berhasil:
                     cnx.commit()
                     st.balloons()
-                    st.success('Transaksi berhasil dengan jumlah harga total :',total_harga)
+                    st.success('Transaksi berhasil dengan jumlah harga total :',kembalian)
                 else:
                     cnx.rollback()
                     if len(produk_stok_tidak_mencukupi) == 1:
