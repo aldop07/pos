@@ -285,18 +285,17 @@ elif menu == 'Tambah Transaksi':
                         st.error(f'Stok produk {produk_stok_tidak_mencukupi[0]} tidak mencukupi')
                     else:
                         st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
-    cursor = cnx.cursor()
-    query = "SELECT MAX(id) FROM transaksi"
-    cursor.execute(query)
-    id = cursor.fetchone()[0]
-    
-    cursor = cnx.cursor()
-    query = 'SELECT total FROM transaksi WHERE id=%s'
-    cursor.execute(query, (id,))
-    result = cursor.fetchone()
-    total = result[0]
-    kembalian = jumlah_bayar - total
-    st.info('Jumlah jumlah kembalian',kembalian)
+    query = "SELECT * FROM transaksi"
+    df = pd.read_sql(query, cnx)
+
+    # mencari duplikat id
+    duplicates = df[df.duplicated(subset='id', keep=False)]
+
+    # mengambil data dengan id terbesar
+    max_id = duplicates['id'].max()
+    max_total = duplicates[duplicates['id'] == max_id]['total'].iloc[0]
+    kembalian = jumlah_bayar - max_total
+    st.info('Jumlah kembalian', kembalian)
 
 # Tampilan menu Tambah Pengeluaran
 elif menu == 'Tambah Pengeluaran':
