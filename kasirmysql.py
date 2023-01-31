@@ -453,8 +453,8 @@ elif menu == 'Laba':
                 st.error('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN DAN PEMASUKAN')
             else:
                 st.write('Total Pengeluaran:', total_pengeluaran_rupiah)
-                st.write('Total transaksi:', total_transaksi_rupiah)
-                st.write('Keuntungan:', pemasukan_rupiah)
+                st.write('Total Penjualan:', total_transaksi_rupiah)
+                st.write('Laba Kotor:', pemasukan_rupiah)
                 st.write('Laba Bersih:', laba_rupiah)
                 st.write('Total Belanja :',belanja_rupiah)
                 
