@@ -491,6 +491,7 @@ elif menu == 'Riwayat Transaksi':
     query = 'SELECT  tanggal, id, nama_pelanggan, nama, jumlah, harga, total FROM transaksi'
     df = pd.read_sql(query, cnx)
     df = df.sort_values(by='tanggal', ascending=False)
+    df = df.sort_values(by='id', ascending=False)
     
     # Tampilkan harga dan total dalam bentuk angka dengan tanda titik sebagai pemisah ribuan
     df['harga'] = df['harga'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
