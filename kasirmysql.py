@@ -244,7 +244,6 @@ elif menu == 'Tambah Transaksi':
         nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
         jumlah_produk = []
         total_harga = 0
-        kembalian = jumlah_bayar - total_harga
     with col2 , col3:
         for produk in nama_produk:
             jumlah = st.number_input(f'Jumlah Produk {produk}',min_value=0)
@@ -266,6 +265,7 @@ elif menu == 'Tambah Transaksi':
                     harga_pokok = result[1]
                     stok_produk = result[2]
                     total_harga += harga_produk * jumlah_produk[i]
+                kembalian = jumlah_bayar - total_harga
                     if stok_produk >= jumlah_produk[i]:
                         # Tambahkan transaksi baru ke tabel transaksi
                         query = 'INSERT INTO transaksi (id, tanggal, nama_pelanggan, nama, jumlah, harga, harga_pokok, total) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
