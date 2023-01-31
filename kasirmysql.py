@@ -240,16 +240,7 @@ elif menu == 'Tambah Transaksi':
         tanggal = st.date_input('Tanggal')
         nama_pelanggan = st.text_input ('Nama Pelanggan')
         jumlah_bayar = st.number_input ('Bayar',0)
-    with col2:
-        nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
-        jumlah_produk = []
-        total_harga = 0
-    with col2 , col3:
-        for produk in nama_produk:
-            jumlah = st.number_input(f'Jumlah Produk {produk}',min_value=0)
-            jumlah_produk.append(jumlah)
-    with col1:
-        if st.button('Simpan'):
+        if jumlah_bayar:
             cursor = cnx.cursor()
             query = "SELECT MAX(id) FROM transaksi"
             cursor.execute(query)
@@ -270,6 +261,16 @@ elif menu == 'Tambah Transaksi':
             st.write("Jumlah Belanja : ", total_rupiah)
             st.write("Jumlah Bayar :", bayar)
             st.write("Uang Kembalian : ", kembalian_rupiah)
+    with col2:
+        nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
+        jumlah_produk = []
+        total_harga = 0
+    with col2 , col3:
+        for produk in nama_produk:
+            jumlah = st.number_input(f'Jumlah Produk {produk}',min_value=0)
+            jumlah_produk.append(jumlah)
+    with col1:
+        if st.button('Simpan'):
             if nama_pelanggan == "" or sum(jumlah_produk) == 0 or 0 in jumlah_produk:
                 st.warning("Periksa Nama Pelanggan dan Jumlah Produk")
             else:
