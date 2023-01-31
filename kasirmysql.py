@@ -264,8 +264,8 @@ elif menu == 'Tambah Transaksi':
                     harga_produk = result[0]
                     harga_pokok = result[1]
                     stok_produk = result[2]
-                    total_harga += harga_produk * jumlah_produk[i]
-                kembalian = jumlah_bayar - total_harga
+                    total_harga = harga_produk * jumlah_produk[i]
+                    kembalian = jumlah_bayar - total_harga
                     if stok_produk >= jumlah_produk[i]:
                         # Tambahkan transaksi baru ke tabel transaksi
                         query = 'INSERT INTO transaksi (id, tanggal, nama_pelanggan, nama, jumlah, harga, harga_pokok, total) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
