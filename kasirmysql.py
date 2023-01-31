@@ -289,7 +289,7 @@ elif menu == 'Tambah Transaksi':
         cursor = cnx.cursor()
         query = "SELECT MAX(id) FROM produk"
         cursor.execute(query)
-        id = cursor.fetchone()
+        id = cursor.fetchone()[0]
 
         cursor = cnx.cursor()
         query = 'SELECT SUM(total) from transaksi WHERE id = %s'
@@ -299,6 +299,7 @@ elif menu == 'Tambah Transaksi':
         kembalian = jumlah_bayar - total
         total_rupiah = 'Rp. {:,}'.format(total).replace(',', '.')
         kembalian_rupiah = 'Rp. {:,}'.format(kembalian).replace(',', '.')
+        st.write("ID :",id)
         st.write("Jumlah Belanja: ", total_rupiah)
         st.write("Uang Kembalian: ", kembalian_rupiah)
 
