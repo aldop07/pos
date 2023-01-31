@@ -277,6 +277,12 @@ elif menu == 'Tambah Transaksi':
                         produk_stok_tidak_mencukupi.append(nama_produk[i])
                 if transaksi_berhasil:
                     cnx.commit()
+                    cursor = cnx.cursor()
+                    query = 'SELECT total FROM transaksi WHERE id=%s'
+                    cursor.execute(query, (id,))
+                    result = cursor.fetchone()
+                    total = result[0]
+                    kembalian = jumlah_bayar - total
                     st.balloons()
                     st.success('Transaksi berhasil dengan jumlah harga total :',kembalian)
                 else:
