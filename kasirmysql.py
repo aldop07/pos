@@ -243,7 +243,7 @@ elif menu == 'Tambah Transaksi':
         kembalian = jumlah_bayar - total_harga
     with col2:
         nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
-        jumlah_kembalian = st.write('Kembalian :'kembalian')
+        jumlah_kembalian = st.write('Kembalian :',kembalian)
         jumlah_produk = []
         total_harga = 0
     with col2 , col3:
