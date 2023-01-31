@@ -239,7 +239,7 @@ elif menu == 'Tambah Transaksi':
             id = last_id + 1
         tanggal = st.date_input('Tanggal')
         nama_pelanggan = st.text_input ('Nama Pelanggan')
-        jumlah_bayar = st.number_input ('Bayar',0)
+        jumlah_bayar = st.number_input ('Bayar',1000)
     with col2:
         nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
         jumlah_produk = []
@@ -277,6 +277,10 @@ elif menu == 'Tambah Transaksi':
                         produk_stok_tidak_mencukupi.append(nama_produk[i])
 
                 if transaksi_berhasil:
+                    if total_harga is None:
+                        id = 0
+                    else:
+                        id = total_harga
                     kembalian = jumlah_bayar - total_harga
                     cnx.commit()
                     st.balloons()
