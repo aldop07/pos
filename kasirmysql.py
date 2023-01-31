@@ -239,7 +239,7 @@ elif menu == 'Tambah Transaksi':
             id = last_id + 1
         tanggal = st.date_input('Tanggal')
         nama_pelanggan = st.text_input ('Nama Pelanggan')
-        jumlah_bayar = st.number_input ('Bayar',0)
+        jumlah_bayar = st.number_input ('Bayar',100000)
     with col2:
         nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
         jumlah_produk = []
@@ -285,20 +285,19 @@ elif menu == 'Tambah Transaksi':
                         st.error(f'Stok produk {produk_stok_tidak_mencukupi[0]} tidak mencukupi')
                     else:
                         st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
-        jumlah_bayar = st.number_input ('Bayar',100000)
-        cursor = cnx.cursor()
-        query = "SELECT MAX(id) FROM produk"
-        cursor.execute(query)
-        id = cursor.fetchone()[0]
+    cursor = cnx.cursor()
+    query = "SELECT MAX(id) FROM produk"
+    cursor.execute(query)
+    id = cursor.fetchone()[0]
 
-        cursor = ncx.cursor()
-        query = 'SELECT SUM(total) from transaksi WHERE id = %s'
-        cursor.execute(query,(id,))
-        result = cursor.fetchone()
-        total = result[0]
+    cursor = ncx.cursor()
+    query = 'SELECT SUM(total) from transaksi WHERE id = %s'
+    cursor.execute(query,(id,))
+    result = cursor.fetchone()
+    total = result[0]
 
-        kembalian = jumlah_bayar - total
-        st.info("Kembalian: ", kembalian)
+    kembalian = jumlah_bayar - total
+    st.write("Kembalian: ", kembalian)
 
 # Tampilan menu Tambah Pengeluaran
 elif menu == 'Tambah Pengeluaran':
