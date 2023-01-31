@@ -15,7 +15,7 @@ cnx = mysql.connector.connect(
     host='sql12.freesqldatabase.com',
     database='sql12593622'
 )
-
+cursor = cnx.cursor()
 # Buat titit
 icon = 'https://e7.pngegg.com/pngimages/263/96/png-clipart-hijab-islam-islamic-background-brown-food-thumbnail.png'
 st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
@@ -286,11 +286,10 @@ elif menu == 'Tambah Transaksi':
                     else:
                         st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
     with col1:
-        cursor = cnx.cursor()
         query = "SELECT MAX(id) FROM produk"
         cursor.execute(query)
-        id = cursor.fetchone()[0]
-
+        result1 = cursor.fetchone()
+        id = result1[0]
         cursor = cnx.cursor()
         query = 'SELECT SUM(total) from transaksi WHERE id = %s'
         cursor.execute(query,(id,))
