@@ -240,27 +240,6 @@ elif menu == 'Tambah Transaksi':
         tanggal = st.date_input('Tanggal')
         nama_pelanggan = st.text_input ('Nama Pelanggan')
         jumlah_bayar = st.number_input ('Bayar',0)
-        if jumlah_bayar:
-            cursor = cnx.cursor()
-            query = "SELECT MAX(id) FROM transaksi"
-            cursor.execute(query)
-            result1 = cursor.fetchone()
-            id_1 = result1[0]
-
-            cursor = cnx.cursor()
-            query = 'SELECT SUM(total) from transaksi WHERE id = %s'
-            cursor.execute(query,(id_1,))
-            result = cursor.fetchone()
-            total = result[0]
-
-            kembalian = jumlah_bayar - total
-            total_rupiah = 'Rp. {:,}'.format(total).replace(',', '.')
-            kembalian_rupiah = 'Rp. {:,}'.format(kembalian).replace(',', '.')
-            bayar = 'Rp. {:,}'.format(jumlah_bayar).replace(',', '.')
-            st.write("ID :",id_1)
-            st.write("Jumlah Belanja : ", total_rupiah)
-            st.write("Jumlah Bayar :", bayar)
-            st.write("Uang Kembalian : ", kembalian_rupiah)
     with col2:
         nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
         jumlah_produk = []
@@ -307,6 +286,26 @@ elif menu == 'Tambah Transaksi':
                     else:
                         st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
     with col1:
+            cursor = cnx.cursor()
+            query = "SELECT MAX(id) FROM transaksi"
+            cursor.execute(query)
+            result1 = cursor.fetchone()
+            id_1 = result1[0]
+
+            cursor = cnx.cursor()
+            query = 'SELECT SUM(total) from transaksi WHERE id = %s'
+            cursor.execute(query,(id_1,))
+            result = cursor.fetchone()
+            total = result[0]
+
+            kembalian = jumlah_bayar - total
+            total_rupiah = 'Rp. {:,}'.format(total).replace(',', '.')
+            kembalian_rupiah = 'Rp. {:,}'.format(kembalian).replace(',', '.')
+            bayar = 'Rp. {:,}'.format(jumlah_bayar).replace(',', '.')
+            st.write("ID :",id_1)
+            st.write("Jumlah Belanja : ", total_rupiah)
+            st.write("Jumlah Bayar :", bayar)
+            st.write("Uang Kembalian : ", kembalian_rupiah)
 
 
 # Tampilan menu Tambah Pengeluaran
