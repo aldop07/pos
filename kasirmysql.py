@@ -470,8 +470,8 @@ elif menu == 'Laba':
             kas = total_transaksi_semua + (kas_jumlah)
             kas = 'Rp. {:,}'.format(kas).replace(',', '.')
             
-            if total_pengeluaran == 0 or total_transaksi == 0 or pemasukan == 0 or laba == 0 or modal_now == 0:
-                st.error('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN DAN PEMASUKAN')
+            if total_pengeluaran == 0 or total_transaksi == 0 or pemasukan == 0 or modal_now == 0:
+                st.error('Total Pengeluaran:',total_pengeluaran_rupiah,'Total Penjualan:',total_penjualan_rupiah, 'Laba Kotor:',pemasukan_rupiah,'Laba Bersih:',laba_rupiah,'Total Belanja :',belanja_rupiah)
             else:
                 st.write('Total Pengeluaran:', total_pengeluaran_rupiah)
                 st.write('Total Penjualan:', total_transaksi_rupiah)
