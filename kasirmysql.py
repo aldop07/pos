@@ -215,97 +215,101 @@ elif menu == 'Tambah Produk':
 
 # Tampilan menu Tambah Transaksi
 elif menu == 'Tambah Transaksi':
-    st.header('Tambah Transaksi')
-    query = 'SELECT nama, harga, stok FROM produk'
-    df = pd.read_sql(query, cnx)
-    search = st.text_input('Cari produk', key='search')
-    if search:
-        df = df[df['nama'].str.contains(search, case=False, na=False)]
-    df['harga'] = df['harga'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
-    st.dataframe(df,width=1500, height=140)
-    # Ambil data produk dari database MySQL
-    query = 'SELECT * FROM produk'
-    df = pd.read_sql(query, cnx)
-    col1, col2, col3 = st.columns(3)
-    # Buat list nama produk untuk dipilih dalam form input transaksi
-    with col1:
-        cursor = cnx.cursor()
-        query = "SELECT MAX(id) FROM transaksi"
-        cursor.execute(query)
-        last_id = cursor.fetchone()[0]
-        if last_id is None:
-            id = 1
-        else:
-            id = last_id + 1
-        tanggal = st.date_input('Tanggal')
-        nama_pelanggan = st.text_input ('Nama Pelanggan')
-        jumlah_bayar = st.number_input ('Bayar',0)
-    with col2:
-        nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
-        jumlah_produk = []
-        total_harga = 0
-    with col2 , col3:
-        for produk in nama_produk:
-            jumlah = st.number_input(f'Jumlah Produk {produk}',min_value=0)
-            jumlah_produk.append(jumlah)
-    with col1:
-        if st.button('Simpan'):
-            if nama_pelanggan == "" or sum(jumlah_produk) == 0 or 0 in jumlah_produk:
-                st.warning("Periksa Nama Pelanggan dan Jumlah Produk")
+    try:
+        st.header('Tambah Transaksi')
+        query = 'SELECT nama, harga, stok FROM produk'
+        df = pd.read_sql(query, cnx)
+        search = st.text_input('Cari produk', key='search')
+        if search:
+            df = df[df['nama'].str.contains(search, case=False, na=False)]
+        df['harga'] = df['harga'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
+        st.dataframe(df,width=1500, height=140)
+        # Ambil data produk dari database MySQL
+        query = 'SELECT * FROM produk'
+        df = pd.read_sql(query, cnx)
+        col1, col2, col3 = st.columns(3)
+        # Buat list nama produk untuk dipilih dalam form input transaksi
+        with col1:
+            cursor = cnx.cursor()
+            query = "SELECT MAX(id) FROM transaksi"
+            cursor.execute(query)
+            last_id = cursor.fetchone()[0]
+            if last_id is None:
+                id = 1
             else:
-                # Buat objek cursor
-                cursor = cnx.cursor()
-                transaksi_berhasil = True
-                produk_stok_tidak_mencukupi = []
-                for i in range(len(nama_produk)):
-                    query = 'SELECT harga, harga_pokok, stok FROM produk WHERE nama = %s;'
-                    cursor.execute(query, (nama_produk[i],))
-                    result = cursor.fetchone()
-                    harga_produk = result[0]
-                    harga_pokok = result[1]
-                    stok_produk = result[2]
-                    total_harga = harga_produk * jumlah_produk[i]
-                    if stok_produk >= jumlah_produk[i]:
-                        # Tambahkan transaksi baru ke tabel transaksi
-                        query = 'INSERT INTO transaksi (id, tanggal, nama_pelanggan, nama, jumlah, harga, harga_pokok, total) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
-                        cursor.execute(query, (id, tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, harga_pokok, total_harga))
-                        # Kurangi stok produk yang dibeli
-                        query = 'UPDATE produk SET stok = stok - %s WHERE nama = %s;'
-                        cursor.execute(query, (jumlah_produk[i], nama_produk[i]))
-                    else:
-                        transaksi_berhasil = False
-                        produk_stok_tidak_mencukupi.append(nama_produk[i])
-                if transaksi_berhasil:
-                    cnx.commit()
-                    st.balloons()
-                    st.success('Transaksi berhasil')
+                id = last_id + 1
+            tanggal = st.date_input('Tanggal')
+            nama_pelanggan = st.text_input ('Nama Pelanggan')
+            jumlah_bayar = st.number_input ('Bayar',0)
+        with col2:
+            nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
+            jumlah_produk = []
+            total_harga = 0
+        with col2 , col3:
+            for produk in nama_produk:
+                jumlah = st.number_input(f'Jumlah Produk {produk}',min_value=0)
+                jumlah_produk.append(jumlah)
+        with col1:
+            if st.button('Simpan'):
+                if nama_pelanggan == "" or sum(jumlah_produk) == 0 or 0 in jumlah_produk:
+                    st.warning("Periksa Nama Pelanggan dan Jumlah Produk")
                 else:
-                    cnx.rollback()
-                    if len(produk_stok_tidak_mencukupi) == 1:
-                        st.error(f'Stok produk {produk_stok_tidak_mencukupi[0]} tidak mencukupi')
+                    # Buat objek cursor
+                    cursor = cnx.cursor()
+                    transaksi_berhasil = True
+                    produk_stok_tidak_mencukupi = []
+                    for i in range(len(nama_produk)):
+                        query = 'SELECT harga, harga_pokok, stok FROM produk WHERE nama = %s;'
+                        cursor.execute(query, (nama_produk[i],))
+                        result = cursor.fetchone()
+                        harga_produk = result[0]
+                        harga_pokok = result[1]
+                        stok_produk = result[2]
+                        total_harga = harga_produk * jumlah_produk[i]
+                        if stok_produk >= jumlah_produk[i]:
+                            # Tambahkan transaksi baru ke tabel transaksi
+                            query = 'INSERT INTO transaksi (id, tanggal, nama_pelanggan, nama, jumlah, harga, harga_pokok, total) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
+                            cursor.execute(query, (id, tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, harga_pokok, total_harga))
+                            # Kurangi stok produk yang dibeli
+                            query = 'UPDATE produk SET stok = stok - %s WHERE nama = %s;'
+                            cursor.execute(query, (jumlah_produk[i], nama_produk[i]))
+                        else:
+                            transaksi_berhasil = False
+                            produk_stok_tidak_mencukupi.append(nama_produk[i])
+                    if transaksi_berhasil:
+                        cnx.commit()
+                        st.balloons()
+                        st.success('Transaksi berhasil')
                     else:
-                        st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
-    with col2:                     
-         cursor = cnx.cursor()
-         query = "SELECT MAX(id) FROM transaksi"
-         cursor.execute(query)
-         result1 = cursor.fetchone()
-         id_1 = result1[0]
+                        cnx.rollback()
+                        if len(produk_stok_tidak_mencukupi) == 1:
+                            st.error(f'Stok produk {produk_stok_tidak_mencukupi[0]} tidak mencukupi')
+                        else:
+                            st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
+        with col2:                     
+             cursor = cnx.cursor()
+             query = "SELECT MAX(id) FROM transaksi"
+             cursor.execute(query)
+             result1 = cursor.fetchone()
+             id_1 = result1[0]
 
-         cursor = cnx.cursor()
-         query = 'SELECT SUM(total) from transaksi WHERE id = %s'
-         cursor.execute(query,(id_1,))
-         result = cursor.fetchone()
-         total = result[0]
+             cursor = cnx.cursor()
+             query = 'SELECT SUM(total) from transaksi WHERE id = %s'
+             cursor.execute(query,(id_1,))
+             result = cursor.fetchone()
+             total = result[0]
 
-         kembalian = jumlah_bayar - total
-         total_rupiah = 'Rp. {:,}'.format(total).replace(',', '.')
-         kembalian_rupiah = 'Rp. {:,}'.format(kembalian).replace(',', '.')
-         bayar = 'Rp. {:,}'.format(jumlah_bayar).replace(',', '.')
-         st.write("ID :",id_1)
-         st.write("Jumlah Belanja : ", total_rupiah)
-         st.write("Jumlah Bayar :", bayar)
-         st.write("Uang Kembalian : ", kembalian_rupiah)
+             kembalian = jumlah_bayar - total
+             total_rupiah = 'Rp. {:,}'.format(total).replace(',', '.')
+             kembalian_rupiah = 'Rp. {:,}'.format(kembalian).replace(',', '.')
+             bayar = 'Rp. {:,}'.format(jumlah_bayar).replace(',', '.')
+             st.write("ID :",id_1)
+             st.write("Jumlah Belanja : ", total_rupiah)
+             st.write("Jumlah Bayar :", bayar)
+             st.write("Uang Kembalian : ", kembalian_rupiah)
+    except TypeError as e:
+        st.error('Tidak Bisa Diakses',e)
+
                         
 
 # Tampilan menu Tambah Pengeluaran
