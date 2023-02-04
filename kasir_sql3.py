@@ -163,8 +163,17 @@ elif menu == 'Tambah Transaksi':
     col1, col2, col3 = st.columns(3)
     # Buat list nama produk untuk dipilih dalam form input transaksi
     with col1:
+        cursor = cnx.cursor()
+        query = "SELECT MAX(id) FROM transaksi"
+        cursor.execute(query)
+        last_id = cursor.fetchone()[0]
+        if last_id is None:
+            id = 1
+        else:
+            id = last_id + 1
         tanggal = st.date_input('Tanggal')
         nama_pelanggan = st.text_input ('Nama Pelanggan')
+        jumlah_bayar = st.number_input ('Bayar',0)
     with col2:
         nama_produk = st.multiselect("Pilih Produk ", df['nama'].tolist())
         jumlah_produk = []
@@ -183,36 +192,54 @@ elif menu == 'Tambah Transaksi':
                 transaksi_berhasil = True
                 produk_stok_tidak_mencukupi = []
                 for i in range(len(nama_produk)):
-                    query = 'SELECT harga, stok FROM produk WHERE nama = ?'
+                    query = 'SELECT harga, harga_pokok, stok FROM produk WHERE nama = ?;'
                     cursor.execute(query, (nama_produk[i],))
                     result = cursor.fetchone()
                     harga_produk = result[0]
-                    stok_produk = result[1]
+                    harga_pokok = result[1]
+                    stok_produk = result[2]
                     total_harga = harga_produk * jumlah_produk[i]
                     if stok_produk >= jumlah_produk[i]:
                         # Tambahkan transaksi baru ke tabel transaksi
-                        query = 'INSERT INTO transaksi (tanggal, nama_pelanggan, nama, jumlah, harga, total) VALUES (?, ?, ?, ?, ?, ?)'
-                        cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, total_harga))
+                        query = 'INSERT INTO transaksi (id, tanggal, nama_pelanggan, nama, jumlah, harga, harga_pokok, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+                        cursor.execute(query, (id, tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, harga_pokok, total_harga))
                         # Kurangi stok produk yang dibeli
-                        query = 'UPDATE produk SET stok = stok - ? WHERE nama = ?'
+                        query = 'UPDATE produk SET stok = stok - ? WHERE nama = ?;'
                         cursor.execute(query, (jumlah_produk[i], nama_produk[i]))
                     else:
                         transaksi_berhasil = False
                         produk_stok_tidak_mencukupi.append(nama_produk[i])
-
                 if transaksi_berhasil:
                     cnx.commit()
-                    with st.spinner('Sedang diproses..'):
-                        time.sleep(3)
-                        st.success('Transaksi berhasil disimpan')
-                        st.balloons()
-                        st.snow()
+                    st.balloons()
+                    st.success('Transaksi berhasil')
                 else:
                     cnx.rollback()
                     if len(produk_stok_tidak_mencukupi) == 1:
                         st.error(f'Stok produk {produk_stok_tidak_mencukupi[0]} tidak mencukupi')
                     else:
                         st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
+    with col2:                     
+         cursor = cnx.cursor()
+         query = "SELECT MAX(id) FROM transaksi"
+         cursor.execute(query)
+         result1 = cursor.fetchone()
+         id_1 = result1[0]
+
+         cursor = cnx.cursor()
+         query = 'SELECT SUM(total) from transaksi WHERE id = ?'
+         cursor.execute(query,(id_1,))
+         result = cursor.fetchone()
+         total = result[0]
+
+         kembalian = jumlah_bayar - total
+         total_rupiah = 'Rp. {:,}'.format(total).replace(',', '.')
+         kembalian_rupiah = 'Rp. {:,}'.format(kembalian).replace(',', '.')
+         bayar = 'Rp. {:,}'.format(jumlah_bayar).replace(',', '.')
+         st.write("ID :",id_1)
+         st.write("Jumlah Belanja : ", total_rupiah)
+         st.write("Jumlah Bayar :", bayar)
+         st.write("Uang Kembalian : ", kembalian_rupiah)
 
 # Tampilan menu Tambah Pengeluaran
 elif menu == 'Tambah Pengeluaran':
@@ -442,16 +469,40 @@ elif menu == 'Data Mining':
 
     elif sub_menu == 'Forecasting':
         st.header('Forecasting')
-        st.info('BELUM FIX')
+        st.info('Forecasting dengan Moving Average')
         query = "SELECT nama FROM produk"
         df = pd.read_sql(query, cnx)
         nama_item = st.selectbox("Pilih produk ", df['nama'].tolist())
-        average = st.number_input('Masukan Jumlah Rentang',min_value=1) 
+        average = st.number_input('Jumlah Rentang',min_value=1) 
+        jumlah_prediksi = st.number_input('Jumlah Hari Prediksi',0)
         if st.button('CEK FORECASTING'):
             query = "SELECT tanggal, jumlah FROM transaksi WHERE nama = ?"
             df = pd.read_sql(query, cnx,params=(nama_item,))
             df.set_index('tanggal', inplace=True)
             df = df.groupby(['tanggal'])['jumlah'].sum().reset_index()
             df['moving_avg'] = df['jumlah'].shift(1).rolling(window=average).mean()
-            df = df.sort_values(by='tanggal', ascending=False)
+            df = df.fillna(0)
+            # forecasting loop
+            #for i in range(jumlah_prediksi):
+             #   last_date = df['tanggal'].iloc[-1]
+             #   next_date = last_date + pd.Timedelta(days=1)
+             #   new_row = pd.DataFrame({
+             #       'tanggal': [next_date],
+             #       'moving_avg': [df['jumlah'].iloc[-average:].mean()],
+             #       'jumlah': [new_row['moving_avg'].iloc[-1]]
+             #   })
+             #   df = pd.concat([df, new_row])
+            #st.dataframe(df)
+            for i in range(jumlah_prediksi):
+                last_date = df['tanggal'].iloc[-1]
+                next_date = last_date + pd.Timedelta(days=1)
+                moving_avg = df['jumlah'].iloc[-average:].mean()
+                new_row = pd.DataFrame({
+                    'tanggal': [next_date],
+                    'moving_avg': [moving_avg],
+                    'jumlah': [moving_avg]
+                })
+                df = pd.concat([df, new_row])
+            df['moving_avg'] = df['moving_avg'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
+            df['jumlah'] = df['jumlah'].apply(lambda x: int(x) if x == x else x)
             st.dataframe(df)
