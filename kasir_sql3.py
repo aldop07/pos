@@ -11,6 +11,7 @@ from mlxtend.frequent_patterns import apriori, association_rules
 
 # Koneksi ke database SQLite
 cnx = sqlite3.connect('kasir.db')
+cursor = cnx.cursor()
 
 # Buat titit
 icon = 'https://e7.pngegg.com/pngimages/263/96/png-clipart-hijab-islam-islamic-background-brown-food-thumbnail.png'
