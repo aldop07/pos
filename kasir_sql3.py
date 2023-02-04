@@ -163,14 +163,6 @@ elif menu == 'Tambah Transaksi':
     col1, col2, col3 = st.columns(3)
     # Buat list nama produk untuk dipilih dalam form input transaksi
     with col1:
-        cursor = cnx.cursor()
-        query = "SELECT MAX(id) FROM transaksi"
-        cursor.execute(query)
-        last_id = cursor.fetchone()[0]
-        if last_id is None:
-            id = 1
-        else:
-            id = last_id + 1
         tanggal = st.date_input('Tanggal')
         nama_pelanggan = st.text_input ('Nama Pelanggan')
         jumlah_bayar = st.number_input ('Bayar',0)
