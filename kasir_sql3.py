@@ -13,7 +13,7 @@ from mlxtend.frequent_patterns import apriori, association_rules
 cnx = sqlite3.connect('kasir.db')
 
 # Buat titit
-icon = 'https://th.bing.com/th/id/R.a406cbfb23b4d4937c5c3e323a7cb567?rik=4qO3lF%2ftE0LZTg&riu=http%3a%2f%2f1.bp.blogspot.com%2f-I-do3iLl5rs%2fUsuaG8IcjhI%2fAAAAAAAAAIE%2fXmXj-zTkS9U%2fs1600%2fUnsera.png&ehk=7Q%2f63voOpFTnTFwucAoLvddSl03O7NITAf9NPD3Ge7M%3d&risl=&pid=ImgRaw&r=0'
+icon = 'https://e7.pngegg.com/pngimages/263/96/png-clipart-hijab-islam-islamic-background-brown-food-thumbnail.png'
 st.set_page_config(page_title="Point Of Sale", page_icon=icon, layout="wide")
 
 st.title('Aplikasi Point Of Sale')
@@ -40,7 +40,18 @@ if menu == 'Dokumentasi':
     st.markdown(':green[Confidence(I1 -> I2) = Support (I1, I2) / Support (I1])')
     st.write('Di mana I1 adalah item atau itemset yang didahului, I2 adalah item atau itemset yang diikuti, Support (I1, I2) adalah support dari itemset yang terdiri dari kedua item atau itemset tersebut, dan Support (I1) adalah support dari item atau itemset yang didahului.')
     #pdf_url = "https://ejournal.bsi.ac.id/ejurnal/index.php/khatulistiwa/article/viewFile/8994/4535"
-
+    kas_input_done = False
+    if not kas_input_done:
+        kas_start = st.number_input('Masukan Kas Awal',0)
+        if st.button('Input Kas'):
+            cursor = cnx.cursor()
+            query = 'INSERT INTO kas (kas_awal) VALUES (?)'
+            cursor.execute(query, (kas_start))
+            cnx.commit()
+            st.success('Kas berhasil disimpan')
+            kas_input_done = True
+    else:
+        st.info('Kas sudah pernah diinput')
     #response = requests.get(pdf_url)
     #with open("temp.pdf", "wb") as f:
     #    f.write(response.content)
@@ -67,10 +78,10 @@ elif menu == 'Daftar Produk':
         search = st.text_input('Cari produk', key='search')
         if search:
             df = df[df['nama'].str.contains(search, case=False, na=False)]
-        st.dataframe(df,width=1500, height=140)
+        st.dataframe(df,width=1500, height=170)
 
     # Tampilkan menu edit produk apabila di centang
-    edit = st.checkbox('Edit Produk')
+    edit = st.checkbox('Edit/Hapus Produk')
     if edit :
         query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
         df = pd.read_sql(query, cnx)
@@ -89,31 +100,48 @@ elif menu == 'Daftar Produk':
                 query = "UPDATE produk SET harga_pokok = ?, nama = ?, harga = ?, stok = ? WHERE id = ?"
                 cursor.execute(query, (harga_pokok, nama, harga, stok, produk))
                 cnx.commit()
-            
-                # Tampilkan pesan sukses
                 st.success("Data produk berhasil diubah")
-                
-    # Tampilan menu hapus produk apabila di centang
-    hapus = st.checkbox('Hapus Produk')
-    if hapus:
-        query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
-        df = pd.read_sql(query, cnx)
-        id_produk = st.selectbox("Pilih ID Produk", df['id'].tolist())
-        nama = st.text_input("Nama Produk",value=df.loc[df['id'] == id_produk, 'nama'].values[0])
-        tombol_hapus = st.button("Hapus")
-        if tombol_hapus:
+        if st.button("Hapus"):
             query = 'DELETE FROM produk WHERE id = ?'
             cursor = cnx.cursor()
-            cursor.execute(query, (id_produk,))
+            cursor.execute(query, (produk,))
             cnx.commit()
             st.success('Produk berhasil dihapus')
- 
+    #Tampilan menu cek hasil update
+    cek_update = st.checkbox('Cek/Hapus Update')
+    if cek_update:
+       query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
+       df = pd.read_sql(query, cnx)
+       df = df.sort_values(by='tanggal', ascending=False)
+       st.dataframe(df,width=1500, height=100)
+       produk = st.selectbox("Id Produk", df['id'].tolist())
+       jumlah = st.number_input("Jumlah", value=df.loc[df['id'] == produk, 'jumlah_update'].values[0])
+       if st.button('Edit'):
+           if jumlah < 1:
+                st.error('Jumlah yang diedit tidak bisa kurang dari 1')
+           else:
+                cursor = cnx.cursor()
+                query = "UPDATE update_produk SET jumlah_update = ? WHERE id = ?"
+                cursor.execute(query, (jumlah, produk))
+                cnx.commit()
+                st.success('Data berhasil diedit')
+            
+       if st.button('Hapus'):
+            query = 'DELETE FROM update_produk WHERE id = ?'
+            cursor = cnx.cursor()
+            cursor.execute(query, (produk,))
+            cnx.commit()
+            st.success('Produk berhasil dihapus')
     with col2:
         # Tambahkan form input untuk mengubah stok produk
+        query = 'SELECT id, harga_pokok, nama, harga, stok FROM produk'
+        df = pd.read_sql(query, cnx)
+        tanggal = st.date_input('Tanggal')
         produk = st.selectbox("Pilih Produk ", df['nama'].tolist())
-        stok_produk_lama = st.number_input('Stok Produk',0)
+        stok_produk_baru = st.number_input('Stok Produk',0)
+
         if st.button('Update'):
-            if stok_produk_lama < 1:
+            if stok_produk_baru < 1:
                 st.error('produk tidak dapat di update')
             else:
                 cursor = cnx.cursor()
@@ -121,10 +149,20 @@ elif menu == 'Daftar Produk':
                 cursor.execute(query_select, (produk,))
                 result = cursor.fetchone()
                 stok_lama = result[0]
-                stok_baru = stok_lama + stok_produk_lama
+                stok_baru = stok_lama + stok_produk_baru
                 query_update = 'UPDATE produk SET stok = ? WHERE nama = ?'
                 cursor.execute(query_update, (stok_baru, produk))
+
+                query = 'SELECT harga_pokok, harga FROM produk WHERE nama = ?'
+                cursor.execute(query, (produk,))   
+                result = cursor.fetchone()
+                harga_pokok = result[0]
+                harga_jual = result[1]
+
+                query = 'INSERT INTO update_produk (tanggal, nama_produk, harga_jual, jumlah_update, jumlah_lama, harga_pokok) VALUES (?, ?, ?, ?, ?, ?)'
+                cursor.execute(query, (tanggal, produk, harga_jual, stok_produk_baru, stok_lama,harga_pokok))
                 cnx.commit()
+
                 st.success('Stok produk berhasil diupdate')
 
 # Tampilan menu Tambah Produk
@@ -193,8 +231,8 @@ elif menu == 'Tambah Transaksi':
                     total_harga = harga_produk * jumlah_produk[i]
                     if stok_produk >= jumlah_produk[i]:
                         # Tambahkan transaksi baru ke tabel transaksi
-                        query = 'INSERT INTO transaksi (id, tanggal, nama_pelanggan, nama, jumlah, harga, harga_pokok, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-                        cursor.execute(query, (id, tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, harga_pokok, total_harga))
+                        query = 'INSERT INTO transaksi (tanggal, nama_pelanggan, nama, jumlah, harga, harga_pokok, total) VALUES (?, ?, ?, ?, ?, ?, ?)'
+                        cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, harga_pokok, total_harga))
                         # Kurangi stok produk yang dibeli
                         query = 'UPDATE produk SET stok = stok - ? WHERE nama = ?;'
                         cursor.execute(query, (jumlah_produk[i], nama_produk[i]))
@@ -256,7 +294,8 @@ elif menu == 'Tambah Pengeluaran':
             df['jumlah_pengeluaran'] = df['jumlah_pengeluaran'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
             st.dataframe(df)
     with col2:
-        edit = st.checkbox('Edit Pengeluaran')
+        # Tampilan menu edit/hapus produk apabila di centang
+        edit = st.checkbox('Edit/Hapus Pengeluaran')
         if edit:
             query = 'SELECT id, nama_pengeluaran, jumlah_pengeluaran, tanggal FROM pengeluaran'
             df = pd.read_sql(query, cnx)
@@ -275,6 +314,14 @@ elif menu == 'Tambah Pengeluaran':
                     cnx.commit()
                     
                     st.success("Data berhasil diubah")
+            
+            tombol_hapus = st.button("Hapus")
+            if tombol_hapus:
+                query = 'DELETE FROM pengeluaran WHERE id = ?'
+                cursor = cnx.cursor()
+                cursor.execute(query, (keterangan_lama,))
+                cnx.commit()
+                st.success('Pengeluaran berhasil dihapus')
 
 # Tampilan menu Laba
 elif menu == 'Laba':
@@ -310,7 +357,7 @@ elif menu == 'Laba':
             
             
             # Hitung pemasukan
-            query = 'SELECT SUM(total - harga_pokok * jumlah) FROM transaksi JOIN produk ON transaksi.nama = produk.nama WHERE transaksi.tanggal BETWEEN ? AND ?'
+            query = 'SELECT SUM(total - harga_pokok * jumlah) FROM transaksi  WHERE tanggal BETWEEN ? AND ?'
             cursor.execute(query, (tanggal_awal, tanggal_akhir))
             result = cursor.fetchone()
             pemasukan = result[0]
@@ -325,7 +372,7 @@ elif menu == 'Laba':
             
 
             # Hitung modal total saat ini
-            query = 'SELECT SUM(harga_pokok * stok) FROM produk'
+            query = 'SELECT SUM(harga_pokok * stok) FROM produk;'
             cursor.execute(query)
             result = cursor.fetchone()
             modal_now = result[0]
@@ -333,29 +380,94 @@ elif menu == 'Laba':
                 modal_now = 0
             modal_now = 'Rp. {:,}'.format(modal_now).replace(',', '.')
             
-            if total_pengeluaran == 0 or total_transaksi == 0 or pemasukan == 0 or laba == 0 or modal_now == 0:
-                st.error('LABA HANYA DAPAT DIHITUNG JIKA ADA PENGELUARAN DAN PEMASUKAN')
+            # Hitung jumlah belanja berdasarkan tanggal
+            query = 'SELECT SUM(harga_pokok * jumlah_update) FROM update_produk WHERE tanggal BETWEEN ? AND ?'
+            cursor.execute(query, (tanggal_awal, tanggal_akhir))
+            result = cursor.fetchone()
+            belanja = result[0]
+            if belanja is None:
+                belanja = 0
+            belanja_rupiah = 'Rp. {:,}'.format(belanja).replace(',', '.')
+            
+            # Hitung jumlah semua transaksi
+            query = 'SELECT SUM(total) FROM transaksi'
+            cursor.execute(query)
+            result = cursor.fetchone()
+            total_transaksi_semua = result[0]
+            if total_transaksi_semua is None:
+                total_transaksi_semua = 0
+
+            # Hitung jumlah semua belanja
+            query = 'SELECT SUM(harga_pokok * jumlah_update) FROM update_produk'
+            cursor.execute(query)
+            result = cursor.fetchone()
+            total_belanja_semua = result[0]
+            if total_belanja_semua is None:
+                total_belanja_semua = 0
+
+            # Hitung jumlah semua pengeluaran
+            query = 'SELECT SUM(jumlah_pengeluaran) FROM pengeluaran'
+            cursor.execute(query)
+            result = cursor.fetchone()
+            total_pengeluaran_semua = result[0]
+            if total_pengeluaran_semua is None:
+                total_pengeluaran_semua = 0
+
+            # Sum kas awal
+            query = 'SELECT SUM(kas_awal) FROM kas'
+            cursor.execute(query)
+            result = cursor.fetchone()
+            kas_awal = result[0]
+            if kas_awal is None:
+                kas_awal = 0
+                
+            # Hitung jumlah total kas dengan perhitungan
+            kas_jumlah = kas_awal - (total_belanja_semua + total_pengeluaran_semua)
+            kas = total_transaksi_semua + (kas_jumlah)
+            kas = 'Rp. {:,}'.format(kas).replace(',', '.')
+            
+            if total_pengeluaran == 0 or total_transaksi == 0 or pemasukan == 0:
+                st.error('Total Pengeluaran: ',total_pengeluaran_rupiah,' Total Penjualan: ',total_penjualan_rupiah)
             else:
                 st.write('Total Pengeluaran:', total_pengeluaran_rupiah)
-                st.write('Total transaksi:', total_transaksi_rupiah)
-                st.write('Keuntungan:', pemasukan_rupiah)
+                st.write('Total Penjualan:', total_transaksi_rupiah)
+                st.write('Laba Kotor:', pemasukan_rupiah)
                 st.write('Laba Bersih:', laba_rupiah)
+                st.write('Total Belanja :',belanja_rupiah)
+                
+                st.info('PERHITUNGAN TANPA PARAMETER TANGGAL AWAL -> AKHIR')
+                st.write('Total Kas Saat Ini :',kas)
                 st.write('Seluruh Modal Saat Ini:', modal_now)
 
 # Tampilan menu Riwayat Transaksi
 elif menu == 'Riwayat Transaksi':
     st.header('Riwayat Transaksi')
     col1, col2 = st.columns(2)
-    query = 'SELECT tanggal, nama, jumlah, harga, total FROM transaksi'
+    query = 'SELECT  tanggal, id, nama_pelanggan, nama, jumlah, harga, total FROM transaksi'
     df = pd.read_sql(query, cnx)
     df = df.sort_values(by='tanggal', ascending=False)
+    df = df.sort_values(by='id', ascending=False)
     
     # Tampilkan harga dan total dalam bentuk angka dengan tanda titik sebagai pemisah ribuan
     df['harga'] = df['harga'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
     df['total'] = df['total'].apply(lambda x: '{:,}'.format(x).replace(',', '.'))
     with col1:
+        
         st.dataframe(df, width=2000, height=250)
-
+        # Tampilan menu hapus produk apabila di centang
+        hapus = st.checkbox('Hapus Transaksi')
+        if hapus:
+            query = 'SELECT id, tanggal, nama, jumlah, harga, total, nama_pelanggan FROM transaksi'
+            df = pd.read_sql(query, cnx)
+            id_produk = st.selectbox("Pilih ID Transaksi", df['id'].tolist())
+            nama = st.text_input("Nama Pembeli",value=df.loc[df['id'] == id_produk, 'nama_pelanggan'].values[0])
+            tombol_hapus = st.button("Hapus")
+            if tombol_hapus:
+                query = 'DELETE FROM transaksi WHERE id = ?'
+                cursor = cnx.cursor()
+                cursor.execute(query, (id_produk,))
+                cnx.commit()
+                st.success('Transaksi berhasil dihapus')
     with col2:
         # Buat grafik jumlah penjualan per bulan
         tanggal_mulai = st.date_input('Tanggal Mulai')
@@ -363,7 +475,7 @@ elif menu == 'Riwayat Transaksi':
     if st.button('CEK GRAFIK'):
 
         # Grafik seluruh penjualan
-        query = "SELECT date(tanggal) as tanggal, SUM(jumlah) as jumlah_penjualan FROM transaksi WHERE tanggal BETWEEN ? AND ? GROUP BY date(tanggal)"
+        query = "SELECT DATE(tanggal) as tanggal, SUM(jumlah) as jumlah_penjualan FROM transaksi WHERE tanggal BETWEEN ? AND ? GROUP BY DATE(tanggal)"
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
         fig = px.bar(df, x='tanggal', y='jumlah_penjualan')
         fig.update_layout(autosize=True)
