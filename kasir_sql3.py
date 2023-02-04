@@ -40,18 +40,14 @@ if menu == 'Dokumentasi':
     st.markdown(':green[Confidence(I1 -> I2) = Support (I1, I2) / Support (I1])')
     st.write('Di mana I1 adalah item atau itemset yang didahului, I2 adalah item atau itemset yang diikuti, Support (I1, I2) adalah support dari itemset yang terdiri dari kedua item atau itemset tersebut, dan Support (I1) adalah support dari item atau itemset yang didahului.')
     #pdf_url = "https://ejournal.bsi.ac.id/ejurnal/index.php/khatulistiwa/article/viewFile/8994/4535"
-    kas_input_done = False
-    if not kas_input_done:
-        kas_start = st.number_input('Masukan Kas Awal',0)
-        if st.button('Input Kas'):
+    
+    kas_start = st.number_input('Masukan Kas Awal',0)
+    if st.button('Input Kas'):
             cursor = cnx.cursor()
             query = 'INSERT INTO kas (kas_awal) VALUES (?)'
             cursor.execute(query, (kas_start))
             cnx.commit()
             st.success('Kas berhasil disimpan')
-            kas_input_done = True
-    else:
-        st.info('Kas sudah pernah diinput')
     #response = requests.get(pdf_url)
     #with open("temp.pdf", "wb") as f:
     #    f.write(response.content)
