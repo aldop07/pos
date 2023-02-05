@@ -127,7 +127,7 @@ elif menu == 'Daftar Produk':
                 st.error('Jumlah yang diedit tidak bisa kurang dari 1')
            else:
                 cursor = cnx.cursor()
-                query = "UPDATE update_produk SET tanggal, jumlah_update = ? WHERE id = ?"
+                query = "UPDATE update_produk SET jumlah_update = ?, tanggal = ? WHERE id = ?"
                 cursor.execute(query, (tanggal, jumlah, produk))
                 cnx.commit()
                 st.success('Data berhasil diedit')
