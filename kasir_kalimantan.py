@@ -115,20 +115,20 @@ elif menu == 'Daftar Produk':
     #Tampilan menu cek hasil update
     cek_update = st.checkbox('Cek/Hapus Update')
     if cek_update:
-       query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
-       df = pd.read_sql(query, cnx)
-       df = df.sort_values(by='tanggal', ascending=False)
-       st.dataframe(df,width=1500, height=100)
-       produk = st.selectbox("Id Produk", df['id'].tolist())
-       jumlah = st.number_input("Jumlah", value=df.loc[df['id'] == produk, 'jumlah_update'].values[0])
-       tanggal = st.date_input("Tanggal", value=df.loc[df['id'] == produk, 'tanggal'].values[0])
-       if st.button('Edit'):
-           if jumlah < 1:
+        query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
+        df = pd.read_sql(query, cnx)
+        df = df.sort_values(by='tanggal', ascending=False)
+        st.dataframe(df,width=1500, height=100)
+        produk = st.selectbox("Id Produk", df['id'].tolist())
+        jumlah = st.number_input("Jumlah", value=df.loc[df['id'] == produk, 'jumlah_update'].values[0])
+        tanggal = st.date_input("Tanggal", value=df.loc[df['id'] == produk, 'tanggal'].values[0])
+        if st.button('Edit'):
+            if jumlah < 1:
                 st.error('Jumlah yang diedit tidak bisa kurang dari 1')
-           else:
+            else:
                 cursor = cnx.cursor()
                 query = "UPDATE update_produk SET jumlah_update = ?, tanggal = ? WHERE id = ?"
-                cursor.execute(query, (tanggal, jumlah, produk))
+                cursor.execute(query, (jumlah, tanggal, produk))
                 cnx.commit()
                 st.success('Data berhasil diedit')
             
