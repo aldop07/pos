@@ -9,7 +9,7 @@ from mlxtend.frequent_patterns import apriori, association_rules
 #   IRFAN NOVALDO HUANG
 
 # Koneksi ke database SQLite
-cnx = sqlite3.connect('kasir_kalimantan.db')
+cnx = sqlite3.connect('kasir.db')
 
 # Buat titit
 icon = 'https://e7.pngegg.com/pngimages/263/96/png-clipart-hijab-islam-islamic-background-brown-food-thumbnail.png'
@@ -115,24 +115,24 @@ elif menu == 'Daftar Produk':
     #Tampilan menu cek hasil update
     cek_update = st.checkbox('Cek/Hapus Update')
     if cek_update:
-    query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
-    df = pd.read_sql(query, cnx)
-    df = df.sort_values(by='tanggal', ascending=False)
-    st.dataframe(df,width=1500, height=100)
-    produk = st.selectbox("Id Produk", df['id'].tolist())
-    jumlah = st.number_input("Jumlah", value=df.loc[df['id'] == produk, 'jumlah_update'].values[0])
-    tanggal = st.date_input("Tanggal", value=df.loc[df['id'] == produk, 'tanggal'].values[0])
-    if st.button('Edit'):
-        if jumlah < 1:
-            st.error('Jumlah yang diedit tidak bisa kurang dari 1')
-        else:
-            cursor = cnx.cursor()
-            query = "UPDATE update_produk SET jumlah_update = ?, tanggal = ? WHERE id = ?"
-            cursor.execute(query, (jumlah, tanggal, produk))
-            cnx.commit()
-            st.success('Data berhasil diedit')
+       query = 'SELECT id, nama_produk, jumlah_update, tanggal FROM update_produk'
+       df = pd.read_sql(query, cnx)
+       df = df.sort_values(by='tanggal', ascending=False)
+       st.dataframe(df,width=1500, height=100)
+       produk = st.selectbox("Id Produk", df['id'].tolist())
+       jumlah = st.number_input("Jumlah", value=df.loc[df['id'] == produk, 'jumlah_update'].values[0])
+       tanggal = st.number_input("Jumlah", value=df.loc[df['id'] == produk, 'tanggal'].values[0])
+       if st.button('Edit'):
+           if jumlah < 1:
+                st.error('Jumlah yang diedit tidak bisa kurang dari 1')
+           else:
+                cursor = cnx.cursor()
+                query = "UPDATE update_produk SET jumlah_update = ?, tanggal = ? WHERE id = ?"
+                cursor.execute(query, (jumlah, tanggal, produk))
+                cnx.commit()
+                st.success('Data berhasil diedit')
             
-        if st.button('Hapus'):
+       if st.button('Hapus'):
             query = 'DELETE FROM update_produk WHERE id = ?'
             cursor = cnx.cursor()
             cursor.execute(query, (produk,))
@@ -257,6 +257,7 @@ elif menu == 'Tambah Transaksi':
                     cnx.commit()
                     st.balloons()
                     st.success('Transaksi berhasil')
+                    
                 else:
                     cnx.rollback()
                     if len(produk_stok_tidak_mencukupi) == 1:
@@ -285,7 +286,7 @@ elif menu == 'Tambah Transaksi':
         st.write("Total Belanja : ", total_rupiah)
         st.write("Jumlah Bayar :", bayar)
         st.write("Uang Kembalian : ", kembalian_rupiah)
-        
+
     with st.expander("FAKTUR"):
         cursor = cnx.cursor()
         query = 'SELECT * FROM transaksi WHERE id = (SELECT MAX(id) FROM transaksi)'
@@ -299,7 +300,7 @@ elif menu == 'Tambah Transaksi':
             total = row['total']
             
             data = []
-            data.append(['Citra Rizki R', '', '', ''])
+            data.append(['Nama Toko', '', '', ''])
             data.append(['Invoice', f': {index + 1}'])
             data.append(['Tanggal', f': {tanggal.strftime("%d/%m/%Y")}'])
             data.append(['Nama Pelanggan', f': {nama_pelanggan}'])
@@ -319,6 +320,7 @@ elif menu == 'Tambah Transaksi':
             st.table(df)
             if st.button('CETAK FAKTUR'):
                 df = df
+
 # Tampilan menu Tambah Pengeluaran
 elif menu == 'Tambah Pengeluaran':
     st.header('Tambah Pengeluaran')
@@ -567,7 +569,7 @@ elif menu == 'Data Mining':
             minimum_confidence = st.number_input("Nilai minimum confidence:",0.01)
         
         # Membaca data transaksi dari database SQLite
-        query = 'SELECT tanggal, nama_pelanggan, nama FROM transaksi WHERE tanggal BETWEEN ? AND ?'
+        query = 'SELECT tanggal, nama_pelanggan, id, nama FROM transaksi WHERE tanggal BETWEEN ? AND ?'
         df = pd.read_sql(query, cnx, params=(tanggal_mulai, tanggal_akhir))
         
         # Mengubah tanggal yang ditampilkan  dataframe menjadi objek datatime
@@ -583,10 +585,10 @@ elif menu == 'Data Mining':
             df = df[df['nama'].isin(nama_produk)]  # lakukan sesuai nama produk yang akan di filter
         
         # Menggabungkan tanggal dan nama pelanggan yang sama
-        df['tanggal_nama_pelanggan'] = df['tanggal'].astype(str) +'-'+ df['nama_pelanggan']
+        df['tanggal_id_nama_pelanggan'] = df['tanggal'].astype(str) + '-' + df['id'].astype(str) + '-' + df['nama_pelanggan']
 
         # Mengubah data menjadi tabulasi
-        tabular = pd.crosstab(df['tanggal_nama_pelanggan'],df['nama'])
+        tabular = pd.crosstab(df['tanggal_id_nama_pelanggan'],df['nama'])
 
         # Encoding data
         def hot_encode(x) :
