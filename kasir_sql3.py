@@ -1,6 +1,5 @@
 import streamlit as st
 import sqlite3
-import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,7 +10,6 @@ from mlxtend.frequent_patterns import apriori, association_rules
 
 # Koneksi ke database SQLite
 cnx = sqlite3.connect('kasir.db')
-cursor = cnx.cursor()
 
 # Buat titit
 icon = 'https://e7.pngegg.com/pngimages/263/96/png-clipart-hijab-islam-islamic-background-brown-food-thumbnail.png'
@@ -41,14 +39,24 @@ if menu == 'Dokumentasi':
     st.markdown(':green[Confidence(I1 -> I2) = Support (I1, I2) / Support (I1])')
     st.write('Di mana I1 adalah item atau itemset yang didahului, I2 adalah item atau itemset yang diikuti, Support (I1, I2) adalah support dari itemset yang terdiri dari kedua item atau itemset tersebut, dan Support (I1) adalah support dari item atau itemset yang didahului.')
     #pdf_url = "https://ejournal.bsi.ac.id/ejurnal/index.php/khatulistiwa/article/viewFile/8994/4535"
-    
-    kas_start = st.number_input('Masukan Kas Awal',0)
-    if st.button('Input Kas'):
+
+    cursor = cnx.cursor()
+    query = 'SELECT * FROM kas'
+    cursor.execute(query)
+    data = cursor.fetchone()
+    cursor.close()
+
+    if data is None:
+        kas_start = st.number_input('Masukan Kas Awal',0)
+        if st.button('Input Kas'):
             cursor = cnx.cursor()
             query = 'INSERT INTO kas (kas_awal) VALUES (?)'
-            cursor.execute(query, (kas_start))
+            cursor.execute(query, (kas_start,))
             cnx.commit()
             st.success('Kas berhasil disimpan')
+            cursor.close()
+    else:
+        st.info('Kas hanya dapat di input 1 kali, jika ada keperluan reset hubungi developer')
     #response = requests.get(pdf_url)
     #with open("temp.pdf", "wb") as f:
     #    f.write(response.content)
@@ -156,7 +164,7 @@ elif menu == 'Daftar Produk':
                 harga_pokok = result[0]
                 harga_jual = result[1]
 
-                query = 'INSERT INTO update_produk (tanggal, nama_produk, harga_jual, jumlah_update, jumlah_lama, harga_pokok) VALUES (?, ?, ?, ?, ?, ?)'
+                query = 'INSERT INTO update_produk (tanggal, nama_produk, harga_jual, jumlah_update, jumlah_lama, harga_pokok) VALUES (?, ?, ?, ?, ?, ?, ?)'
                 cursor.execute(query, (tanggal, produk, harga_jual, stok_produk_baru, stok_lama,harga_pokok))
                 cnx.commit()
 
@@ -247,26 +255,27 @@ elif menu == 'Tambah Transaksi':
                     else:
                         st.error(f'Stok produk {", ".join(produk_stok_tidak_mencukupi)} tidak mencukupi')
     with col2:                     
-         cursor = cnx.cursor()
-         query = "SELECT MAX(id) FROM transaksi"
-         cursor.execute(query)
-         result1 = cursor.fetchone()
-         id_1 = result1[0]
+        cursor = cnx.cursor()
+        query = "SELECT MAX(id), nama_pelanggan FROM transaksi"
+        cursor.execute(query)
+        result1 = cursor.fetchone()
+        id_1 = result1[0]
+        nama = result1[1]
+        
+        cursor = cnx.cursor()
+        query = 'SELECT SUM(total) from transaksi WHERE id = ?'
+        cursor.execute(query,(id_1,))
+        result = cursor.fetchone()
+        total = result[0]
 
-         cursor = cnx.cursor()
-         query = 'SELECT SUM(total) from transaksi WHERE id = ?'
-         cursor.execute(query,(id_1,))
-         result = cursor.fetchone()
-         total = result[0]
-
-         kembalian = jumlah_bayar - total
-         total_rupiah = 'Rp. {:,}'.format(total).replace(',', '.')
-         kembalian_rupiah = 'Rp. {:,}'.format(kembalian).replace(',', '.')
-         bayar = 'Rp. {:,}'.format(jumlah_bayar).replace(',', '.')
-         st.write("ID :",id_1)
-         st.write("Jumlah Belanja : ", total_rupiah)
-         st.write("Jumlah Bayar :", bayar)
-         st.write("Uang Kembalian : ", kembalian_rupiah)
+        kembalian = jumlah_bayar - total
+        total_rupiah = 'Rp. {:,}'.format(total).replace(',', '.')
+        kembalian_rupiah = 'Rp. {:,}'.format(kembalian).replace(',', '.')
+        bayar = 'Rp. {:,}'.format(jumlah_bayar).replace(',', '.')
+        st.write("ID :",id_1,"Nama Pelanggan :",nama)
+        st.write("Total Belanja : ", total_rupiah)
+        st.write("Jumlah Bayar :", bayar)
+        st.write("Uang Kembalian : ", kembalian_rupiah)
 
 # Tampilan menu Tambah Pengeluaran
 elif menu == 'Tambah Pengeluaran':
@@ -424,7 +433,7 @@ elif menu == 'Laba':
             kas = 'Rp. {:,}'.format(kas).replace(',', '.')
             
             if total_pengeluaran == 0 or total_transaksi == 0 or pemasukan == 0:
-                st.error('Total Pengeluaran: ',total_pengeluaran_rupiah,' Total Penjualan: ',total_penjualan_rupiah)
+                st.error('Total Pengeluaran: ',total_pengeluaran_rupiah,' Total Penjualan: ',total_transaksi_rupiah)
             else:
                 st.write('Total Pengeluaran:', total_pengeluaran_rupiah)
                 st.write('Total Penjualan:', total_transaksi_rupiah)
