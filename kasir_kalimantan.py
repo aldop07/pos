@@ -298,7 +298,7 @@ elif menu == 'Tambah Transaksi':
             total = row['total']
             
             data = []
-            data.append(['Uneestuff ID', '', '', ''])
+            data.append(['Citra Rizki R', '', '', ''])
             data.append(['Invoice', f': {index + 1}'])
             data.append(['Tanggal', f': {tanggal.strftime("%d/%m/%Y")}'])
             data.append(['Nama Pelanggan', f': {nama_pelanggan}'])
