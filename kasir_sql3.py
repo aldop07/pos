@@ -206,6 +206,14 @@ elif menu == 'Tambah Transaksi':
     col1, col2, col3 = st.columns(3)
     # Buat list nama produk untuk dipilih dalam form input transaksi
     with col1:
+        cursor = cnx.cursor()
+        query = "SELECT MAX(id) FROM transaksi"
+        cursor.execute(query)
+        last_id = cursor.fetchone()[0]
+        if last_id is None:
+            id = 1
+        else:
+            id = last_id + 1
         tanggal = st.date_input('Tanggal')
         nama_pelanggan = st.text_input ('Nama Pelanggan')
         jumlah_bayar = st.number_input ('Bayar',0)
@@ -236,8 +244,8 @@ elif menu == 'Tambah Transaksi':
                     total_harga = harga_produk * jumlah_produk[i]
                     if stok_produk >= jumlah_produk[i]:
                         # Tambahkan transaksi baru ke tabel transaksi
-                        query = 'INSERT INTO transaksi (tanggal, nama_pelanggan, nama, jumlah, harga, harga_pokok, total) VALUES (?, ?, ?, ?, ?, ?, ?)'
-                        cursor.execute(query, (tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, harga_pokok, total_harga))
+                        query = 'INSERT INTO transaksi (id, tanggal, nama_pelanggan, nama, jumlah, harga, harga_pokok, total) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+                        cursor.execute(query, (id, tanggal ,nama_pelanggan, nama_produk[i], jumlah_produk[i], harga_produk, harga_pokok, total_harga))
                         # Kurangi stok produk yang dibeli
                         query = 'UPDATE produk SET stok = stok - ? WHERE nama = ?;'
                         cursor.execute(query, (jumlah_produk[i], nama_produk[i]))
