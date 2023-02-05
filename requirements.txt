@@ -2,7 +2,6 @@ pandas
 streamlit
 mlxtend
 plotly
-pip
 matplotlib
 numpy
 mysql-connector
