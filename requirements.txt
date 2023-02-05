@@ -7,3 +7,4 @@ pip
 numpy
 mysql-connector
 statsmodels
+sqlite3
