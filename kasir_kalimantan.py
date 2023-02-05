@@ -121,14 +121,14 @@ elif menu == 'Daftar Produk':
        st.dataframe(df,width=1500, height=100)
        produk = st.selectbox("Id Produk", df['id'].tolist())
        jumlah = st.number_input("Jumlah", value=df.loc[df['id'] == produk, 'jumlah_update'].values[0])
-       tanggal = st.number_input("Jumlah", value=df.loc[df['id'] == produk, 'tanggal'].values[0])
+       tanggal_baru = st.date_input("Tanggal Baru", value=pd.to_datetime(df.loc[df['id'] == produk, 'tanggal'].values[0]).date())
        if st.button('Edit'):
            if jumlah < 1:
                 st.error('Jumlah yang diedit tidak bisa kurang dari 1')
            else:
                 cursor = cnx.cursor()
                 query = "UPDATE update_produk SET jumlah_update = ?, tanggal = ? WHERE id = ?"
-                cursor.execute(query, (jumlah, tanggal, produk))
+                cursor.execute(query, (jumlah, tanggal_baru, produk))
                 cnx.commit()
                 st.success('Data berhasil diedit')
             
