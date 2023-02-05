@@ -3,7 +3,7 @@ streamlit
 mlxtend
 plotly
 matplotlib
+pip
 numpy
 mysql-connector
 statsmodels
-sqlite3
