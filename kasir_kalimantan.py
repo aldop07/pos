@@ -121,7 +121,7 @@ elif menu == 'Daftar Produk':
        st.dataframe(df,width=1500, height=100)
        produk = st.selectbox("Id Produk", df['id'].tolist())
        jumlah = st.number_input("Jumlah", value=df.loc[df['id'] == produk, 'jumlah_update'].values[0])
-       tanggal = st.date_input("Tanggal", value=df.loc[df['tanggal'] == produk, 'jumlah_update'].values[0])
+       tanggal = st.date_input("Tanggal", value=df.loc[df['id'] == produk, 'tanggal'].values[0])
        if st.button('Edit'):
            if jumlah < 1:
                 st.error('Jumlah yang diedit tidak bisa kurang dari 1')
