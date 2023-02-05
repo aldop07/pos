@@ -164,7 +164,7 @@ elif menu == 'Daftar Produk':
                 harga_pokok = result[0]
                 harga_jual = result[1]
 
-                query = 'INSERT INTO update_produk (tanggal, nama_produk, harga_jual, jumlah_update, jumlah_lama, harga_pokok) VALUES (?, ?, ?, ?, ?, ?, ?)'
+                query = 'INSERT INTO update_produk (tanggal, nama_produk, harga_jual, jumlah_update, jumlah_lama, harga_pokok) VALUES (?, ?, ?, ?, ?, ?)'
                 cursor.execute(query, (tanggal, produk, harga_jual, stok_produk_baru, stok_lama,harga_pokok))
                 cnx.commit()
 
@@ -284,7 +284,40 @@ elif menu == 'Tambah Transaksi':
         st.write("Total Belanja : ", total_rupiah)
         st.write("Jumlah Bayar :", bayar)
         st.write("Uang Kembalian : ", kembalian_rupiah)
+        
+    with st.expander("FAKTUR"):
+        cursor = cnx.cursor()
+        query = 'SELECT * FROM transaksi WHERE id = (SELECT MAX(id) FROM transaksi)'
+        df = pd.read_sql(query, cnx)
 
+        df_grouped = df.groupby(['nama_pelanggan', 'tanggal'])['nama', 'harga', 'jumlah', 'total'].sum().reset_index()
+
+        for index, row in df_grouped.iterrows():
+            tanggal = pd.to_datetime(row['tanggal'])
+            nama_pelanggan = row['nama_pelanggan']
+            total = row['total']
+            
+            data = []
+            data.append(['Uneestuff ID', '', '', ''])
+            data.append(['Invoice', f': {index + 1}'])
+            data.append(['Tanggal', f': {tanggal.strftime("%d/%m/%Y")}'])
+            data.append(['Nama Pelanggan', f': {nama_pelanggan}'])
+            data.append([''])
+            data.append(['Produk', 'Harga', 'Pcs', 'Jumlah'])
+            sub_df = df[df['nama_pelanggan'] == nama_pelanggan]
+            for name, group in sub_df.groupby('nama'):
+                harga = 'Rp. ' + '{:,.0f}'.format(group['harga'].iloc[0]).replace(',', '.')
+                jumlah = int(group['jumlah'].sum())
+                sub_total = 'Rp. ' + '{:,.0f}'.format(group['total'].sum()).replace(',', '.')
+                data.append([name, harga, jumlah, sub_total])
+            total = 'Rp. ' + '{:,.0f}'.format(total).replace(',', '.')
+            data.append(['', '', 'TOTAL', total])
+            data.append(['', '', 'Bayar', bayar])
+            data.append(['', '', 'Kembali', kembalian_rupiah])
+            df = pd.DataFrame(data).fillna('')
+            st.table(df)
+            if st.button('CETAK FAKTUR'):
+                df = df
 # Tampilan menu Tambah Pengeluaran
 elif menu == 'Tambah Pengeluaran':
     st.header('Tambah Pengeluaran')
